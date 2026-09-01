@@ -1,0 +1,80 @@
+.solitaire {
+    min-height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.solitaire__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.solitaire__back-button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.solitaire__new-game-button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.solitaire__top-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 50px;
+}
+
+.solitaire__pile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.solitaire__pile-title {
+    margin: 0;
+    font-size: 14px;
+}
+
+.solitaire__card-placeholder {
+    width: 100px;
+    height: 140px;
+    border: 2px dashed #999;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.solitaire__foundations {
+    display: flex;
+    gap: 15px;
+    margin-left: 50px;
+}
+
+.solitaire__tableau {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.solitaire__column {
+    width: 100px;
+    min-height: 140px;
+    position: relative;
+}
+
+.solitaire__card {
+    width: 100px;
+    display: block;
+}
+
+.solitaire__card--stacked {
+    margin-top: -100px;
+}

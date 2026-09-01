@@ -9,3 +9,10 @@ export type Card ={
     image: string
     faceUp: boolean
 }
+
+export type GameState = {
+    stock: Card[]
+    waste: Card[]
+    foundations: Card[][]
+    tableau: Card[][]
+}
