@@ -3,12 +3,23 @@ import { useState } from "react"
 import type {GameState} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
 import { dealGame } from "../games/solitaire/game"
+import { calculatedCardSpacing } from "../games/solitaire/layout"
+import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 
 function Solitaire() {
   const navigate = useNavigate();
 
   const [gameState, setGameState] = useState<GameState | null>(null)
+
+  /* card layout scaling */
+  const CARD_WIDTH = 100;
+  const CARD_HEIGHT = 140;
+
+  const MIN_CARD_SPACING = 15;
+  const MAX_CARD_SPACING = 35;
+
+  const TABLEAU_HEIGHT = 600;
 
   function startNewGame() {
     const newDeck = createDeck();
@@ -38,28 +49,30 @@ function Solitaire() {
         <div className="solitaire__board">
            {/* Top row: stock, waste and foundations */}
           <div className="solitaire__top-row">
-            {/* Stock */}
-            <div className="solitaire__pile">
-              <h3 className="solitaire__pile-title">
-                Stock
-              </h3>
+            <div className="solitaire__top-left">
+              {/* Stock */}
+              <div className="solitaire__pile">
+                <h3 className="solitaire__pile-title">
+                  Stock
+                </h3>
 
-              {gameState.stock.length > 0 && (
-                <img
-                  className="solitaire__card"
-                  src="/cards/card_back.png"
-                  alt="Stock"
-                />
-              )}
-            </div>
+                {gameState.stock.length > 0 && (
+                  <img
+                    className="solitaire__card solitaire__stock-card"
+                    src="/cards/card_back.png"
+                    alt="Stock"
+                  />
+                )}
+              </div>
 
-            {/* Waste */}
-            <div className="solitaire__pile">
-              <h3 className="solitaire__pile-title">
-                Waste
-              </h3>
+              {/* Waste */}
+              <div className="solitaire__pile">
+                <h3 className="solitaire__pile-title">
+                  Waste
+                </h3>
 
-              <div className="solitaire__card-placeholder" />
+                <div className="solitaire__card-placeholder" />
+              </div>
             </div>
 
             {/* Foundations */}
@@ -79,35 +92,7 @@ function Solitaire() {
           </div>
 
           {/* Tableau */}
-          <div className="solitaire__tableau">
-            {gameState.tableau.map(
-              (column, columnIndex) => (
-                <div 
-                  className="solitaire__column" 
-                  key={columnIndex}
-                >
-                  {column.map(
-                    (card, cardIndex) => (
-                      <img 
-                        key={card.id} 
-                        className={`solitaire__card ${
-                          cardIndex > 0 
-                            ? "solitaire__card--stacked" 
-                            : ""
-                        }`} 
-                        src={ 
-                          card.faceUp 
-                            ? card.image 
-                            : "/cards/card_back.png"
-                        } 
-                        alt={`${card.value} ${card.suit}`} 
-                      />
-                    )
-                  )}
-                </div>
-              )
-            )}
-          </div>
+          <Tableau tableau={gameState.tableau} />
         </div>
       )}
     </main>
