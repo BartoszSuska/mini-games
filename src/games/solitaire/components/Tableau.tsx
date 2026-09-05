@@ -1,91 +1,47 @@
-import { useEffect, useRef, useState } from "react";
-
 import type { Card } from "../types";
 import { calculatedCardSpacing } from "../layout";
 
 type TableauProps = {
   tableau: Card[][];
+  cardHeight: number;
+  availableHeight: number;
 };
 
-const CARD_ASPECT_RATIO = 5 / 7;
+const MIN_CARD_SPACING_RATIO = 0.08;
+const MAX_CARD_SPACING_RATIO = 0.25;
 
-const MIN_CARD_SPACING = 15;
-const MAX_CARD_SPACING = 35;
 
-function Tableau({ tableau }: TableauProps) {
-  const tableauRef = useRef<HTMLDivElement | null>(null);
 
-  const [tableauHeight, setTableauHeight] = useState(0);
-  const [cardWidth, setCardWidth] = useState(100);
-
-  useEffect(() => {
-    const element = tableauRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-
-      if (!entry) {
-        return;
-      }
-
-      const { width, height } = entry.contentRect;
-
-      setTableauHeight(height);
-
-      /*
-       * Tableau ma 7 kolumn.
-       * Obliczamy szerokość pojedynczej kolumny.
-       */
-      const columnWidth = width / 7;
-
-      /*
-       * Karta nie powinna być szersza niż kolumna.
-       * Możemy zostawić trochę miejsca po bokach.
-       */
-      const newCardWidth = Math.min(
-        100,
-        Math.max(55, columnWidth * 0.9)
-      );
-
-      setCardWidth(newCardWidth);
-    });
-
-    resizeObserver.observe(element);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
-  const cardHeight =
-    cardWidth / CARD_ASPECT_RATIO;
-
+function Tableau({
+  tableau,
+  cardHeight,
+  availableHeight,
+}: TableauProps) {
   return (
-    <div
-      ref={tableauRef}
-      className="solitaire__tableau"
-    >
+    <div className="solitaire__tableau">
       {tableau.map((column, columnIndex) => {
+        const minSpacing =
+          cardHeight * MIN_CARD_SPACING_RATIO;
+
+        const maxSpacing =
+          cardHeight * MAX_CARD_SPACING_RATIO;        
+          
         const spacing = calculatedCardSpacing(
           column.length,
-          tableauHeight,
+          availableHeight,
           cardHeight,
-          MIN_CARD_SPACING,
-          MAX_CARD_SPACING
+          minSpacing,
+          maxSpacing
         );
 
         const columnHeight =
-          (column.length - 1) * spacing +
+          Math.max(0, column.length - 1) * spacing +
           cardHeight;
 
         return (
           <div
-            className="solitaire__column"
             key={columnIndex}
+            className="solitaire__column"
             style={{
               height: `${columnHeight}px`,
             }}
@@ -102,7 +58,6 @@ function Tableau({ tableau }: TableauProps) {
                 alt={`${card.value} ${card.suit}`}
                 style={
                   {
-                    "--card-width": `${cardWidth}px`,
                     "--card-top": `${cardIndex * spacing}px`,
                   } as React.CSSProperties
                 }

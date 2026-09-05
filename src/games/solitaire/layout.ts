@@ -9,9 +9,13 @@ export function calculatedCardSpacing(
         return maxSpacing
     }
 
+    if(availableHeight <= 0) {
+        return maxSpacing
+    }
+
     const gapCount = cardCount -1
 
-    const availableSpaceForGaps = availableHeight - cardHeight
+    const availableSpaceForGaps = Math.max(0, availableHeight - cardHeight)
 
     const calculatedSpacing = availableSpaceForGaps / gapCount
 

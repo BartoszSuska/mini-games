@@ -1,22 +1,19 @@
 .solitaire {
-    --card-width: clamp(55px, 8vw, 100px);
-    --card-height: auto;
-
-    --layout-gap: clamp(8px, 2vw, 20px);
-    --tableau-gap: clamp(4px, 1.5vw, 15px);
-
-    min-height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     padding: clamp(10px, 3vw, 30px);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .solitaire__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .solitaire__back-button {
@@ -36,8 +33,11 @@
 }
 
 .solitaire__board{
+    width: 100%;
     display: flex;
     flex-direction: column;
+    gap: var(--board-gap);
+
     flex: 1;
     min-height: 0;
 }
@@ -47,13 +47,13 @@
     align-items: flex-start;
     justify-content: space-between;
     width: 100%;
-    gap: var(--layout-gap);
-    margin-bottom: clamp(25px, 5vw, 50px);
+    gap: var(--top-row-gap);
+    flex-shrink: 0;
 }
 
 .solitaire__top-left {
     display: flex;
-    gap: var(--layout-gap);
+    gap: var(--top-row-gap);
     flex-shrink: 0;
 }
 
@@ -71,7 +71,7 @@
 
 .solitaire__card-placeholder {
     width: var(--card-width);
-    aspect-ratio: 5/7;
+    height: var(--card-height);
     border: 2px dashed #999;
     border-radius: 8px;
     box-sizing: border-box;
@@ -79,14 +79,15 @@
 
 .solitaire__foundations {
     display: flex;
-    gap: var(--layout-gap);
+    gap: var(--top-row-gap);
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 .solitaire__tableau {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: var(--layout-gap);
+    gap: var(--tableau-gap);
     align-items: flex-start;
 
     width: 100%;
@@ -104,8 +105,8 @@
 }
 
 .solitaire__card {
-    width: var(--card-width, 100px);
-    height: auto;
+    width: var(--card-width);
+    height: var(--card-height);
     display: block;
 
     user-select: none;
@@ -124,4 +125,47 @@
 
 /* .solitaire__card--stacked {
     margin-top: -100px;
+} */
+
+/* smaller screens */
+@media (max-width: 700px) {
+  .solitaire {
+    padding: 10px;
+  }
+
+  .solitaire__header {
+    margin-bottom: 10px;
+  }
+
+  .solitaire__top-row {
+    gap: 10px;
+  }
+
+  .solitaire__top-left {
+    gap: 10px;
+  }
+
+  .solitaire__foundations {
+    gap: 8px;
+  }
+
+  .solitaire__pile-title {
+    display: none;
+  }
+
+  .solitaire__board {
+    gap: 15px;
+  }
+}
+/* possible layout for smaller screens, but not used for now. It basically change the layout so the stock and waste are above foundations but still 7 columns take most of the space */
+/* @media (max-width: 550px) {
+    .solitaire__top-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .solitaire__foundations {
+        margin-left: 0;
+    }
 } */
