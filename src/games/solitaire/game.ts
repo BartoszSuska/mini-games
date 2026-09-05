@@ -42,3 +42,52 @@ export function dealGame(deck: Card[]): GameState {
         tableau,
     }
 }
+
+export function drawFromStock(gameState: GameState): GameState {
+    if(gameState.stock.length === 0) {
+        return gameState
+    }
+
+    const stock = [...gameState.stock]
+    const waste = [...gameState.waste]
+
+    const card = stock.pop()
+
+    if(!card){
+        return gameState
+    }
+
+    waste.push({
+        ...card,
+        faceUp: true,
+    })
+
+    return {
+        ...gameState,
+        stock,
+        waste
+    }
+}
+
+export function recycleWaste(gameState: GameState): GameState {
+    if(gameState.stock.length > 0){
+        return gameState
+    }
+
+    if(gameState.waste.length === 0){
+        return gameState
+    }
+
+    const stock = [...gameState.waste]
+        .reverse()
+        .map((card) => ({
+            ...card,
+            faceUp: false,
+        }))
+    
+    return {
+        ...gameState,
+        stock,
+        waste: []
+    }
+}

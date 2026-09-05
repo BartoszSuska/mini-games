@@ -1,156 +1,28 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import type {GameState} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
-import { dealGame } from "../games/solitaire/game"
-import { calculatedCardSpacing } from "../games/solitaire/layout"
+import { dealGame, drawFromStock, recycleWaste } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
+import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
+import TopRow from "../games/solitaire/components/TopRow";
 
 function Solitaire() {
   const navigate = useNavigate();
 
   const [gameState, setGameState] = useState<GameState | null>(null)
-  const boardRef = useRef<HTMLDivElement | null>(null)
-  const topRowRef = useRef<HTMLDivElement | null>(null)
 
-  const [boardSize, setBoardSize] = useState({ width: 0, height: 0 })
-  const [topRowHeight, setTopRowHeight] = useState(0)
-
-  /* Resize observers for board and top row */
-  useEffect(() => {
-    const boardElement = boardRef.current;
-    const topRowElement = topRowRef.current;
-
-    if (!boardElement || !topRowElement) {
-      return;
-    }
-
-    const boardResizeObserver = new ResizeObserver(
-      ([entry]) => {
-        if (!entry) {
-          return;
-        }
-
-        const { width, height } = entry.contentRect;
-
-        setBoardSize({
-          width,
-          height,
-        });
-      }
-    );
-
-    const topRowResizeObserver = new ResizeObserver(
-      ([entry]) => {
-        if (!entry) {
-          return;
-        }
-
-        setTopRowHeight(entry.contentRect.height);
-      }
-    );
-
-    boardResizeObserver.observe(boardElement);
-    topRowResizeObserver.observe(topRowElement);
-
-    return () => {
-      boardResizeObserver.disconnect();
-      topRowResizeObserver.disconnect();
-    };
-  }, [gameState]);
-
-  /* card and board layout scaling */
-
-  const CARD_ASPECT_RATIO = 7 / 10;
-
-  const TABLEAU_COLUMNS = 7;
-
-  const MAX_CARD_WIDTH = 150;
-
-  const MAX_TABLEAU_GAP = 15;
-
-  const tableauGap = Math.min(
-    MAX_TABLEAU_GAP,
-    boardSize.width * 0.015
-  );
-
-  const totalGapWidth =
-    tableauGap * (TABLEAU_COLUMNS - 1);
-
-  const availableWidthForCards = Math.max(
-    0,
-    boardSize.width - totalGapWidth
-  );
-
-  const cardWidthFromWidth =
-    availableWidthForCards / TABLEAU_COLUMNS;
-
-
-  /* vertical layout */
-
-  const MAX_BOARD_GAP = 24;
-
-  const boardGap = Math.min(
-    MAX_BOARD_GAP,
-    boardSize.height * 0.03
-  );
-
-  const tableauHeight = Math.max(
-    0,
-    boardSize.height -
-      topRowHeight -
-      boardGap
-  );
-
-
-  /* longest tableau column */
-
-  const longestColumnLength = gameState
-    ? Math.max(
-        ...gameState.tableau.map(
-          (column) => column.length
-        )
-      )
-    : 0;
-
-
-  /* card size limited by height */
-
-  const MIN_CARD_SPACING_RATIO = 0.08;
-
-  const cardHeightMultiplier =
-    1 +
-    Math.max(0, longestColumnLength - 1) *
-      MIN_CARD_SPACING_RATIO;
-
-  const cardHeightFromHeight =
-    tableauHeight / cardHeightMultiplier;
-
-  const cardWidthFromHeight =
-    cardHeightFromHeight * CARD_ASPECT_RATIO;
-
-
-  /* final card size */
-
-  const cardWidth = Math.min(
-    MAX_CARD_WIDTH,
-    cardWidthFromWidth,
-    cardWidthFromHeight
-  );
-
-  const cardHeight =
-    cardWidth / CARD_ASPECT_RATIO;
-
-
-  /* top row spacing */
-
-  const MAX_TOP_ROW_GAP = 20;
-
-  const topRowGap = Math.min(
-    MAX_TOP_ROW_GAP,
-    boardSize.width * 0.02
-  );
+  const {
+    boardRef,
+    topRowRef,
+    cardWidth,
+    cardHeight,
+    tableauGap,
+    topRowGap,
+    boardGap,
+    tableauHeight,
+  } = useSolitaireLayout(gameState);
 
   /* start new game */
   function startNewGame() {
@@ -161,6 +33,19 @@ function Solitaire() {
     const newGame = dealGame(shuffledDeck)
 
     setGameState(newGame)
+  }
+
+  function handleStockClick() {
+    if(!gameState){
+      return
+    }
+
+    if(gameState.stock.length > 0) {
+      setGameState(drawFromStock(gameState))
+      return
+    }
+
+    setGameState(recycleWaste(gameState))
   }
 
   return (
@@ -191,61 +76,21 @@ function Solitaire() {
             } as React.CSSProperties
           }
         >
-           {/* Top row: stock, waste and foundations */}
-          <div 
-            className="solitaire__top-row"
-            ref={topRowRef}
-          >
-            <div className="solitaire__top-left">
-              {/* Stock */}
-              <div className="solitaire__pile">
-                <h3 className="solitaire__pile-title">
-                  Stock
-                </h3>
-
-                {gameState.stock.length > 0 && (
-                  <img
-                    className="solitaire__card solitaire__stock-card"
-                    src="/cards/card_back.png"
-                    alt="Stock"
-                  />
-                )}
-              </div>
-
-              {/* Waste */}
-              <div className="solitaire__pile">
-                <h3 className="solitaire__pile-title">
-                  Waste
-                </h3>
-
-                <div className="solitaire__card-placeholder" />
-              </div>
-            </div>
-
-            {/* Foundations */}
-            <div className="solitaire__foundations">
-              {gameState.foundations.map(
-                (_, index) => (
-                  <div className="solitaire__pile" key={index}>
-                    <h3 className="solitaire__pile-title">
-                      Foundation
-                    </h3>
-
-                    <div className="solitaire__card-placeholder" />
-                  </div>
-                )
-              )}
-            </div>
-          </div>
+          {/* Top row: stock, waste and foundations */}
+          <TopRow
+            stock={gameState.stock}
+            waste={gameState.waste}
+            foundations={gameState.foundations}
+            topRowRef={topRowRef}
+            onStockClick={handleStockClick}
+          />
 
           {/* Tableau */}
-          <div className="solitaire__tableau-scroll">
-            <Tableau
-              tableau={gameState.tableau}
-              cardHeight={cardHeight}
-              availableHeight={tableauHeight}
-            />
-          </div>
+          <Tableau
+            tableau={gameState.tableau}
+            cardHeight={cardHeight}
+            availableHeight={tableauHeight}
+          />
         </div>
       )}
     </main>

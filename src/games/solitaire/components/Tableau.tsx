@@ -1,16 +1,15 @@
-import type { Card } from "../types";
+import type { Card as CardType } from "../types";
 import { calculatedCardSpacing } from "../layout";
+import Card from "./Card"
 
 type TableauProps = {
-  tableau: Card[][];
+  tableau: CardType[][];
   cardHeight: number;
   availableHeight: number;
 };
 
 const MIN_CARD_SPACING_RATIO = 0.08;
 const MAX_CARD_SPACING_RATIO = 0.25;
-
-
 
 function Tableau({
   tableau,
@@ -47,15 +46,10 @@ function Tableau({
             }}
           >
             {column.map((card, cardIndex) => (
-              <img
+              <Card
                 key={card.id}
-                className="solitaire__card solitaire__tableau-card"
-                src={
-                  card.faceUp
-                    ? card.image
-                    : "/cards/card_back.png"
-                }
-                alt={`${card.value} ${card.suit}`}
+                card={card}
+                className="solitaire__tableau-card"
                 style={
                   {
                     "--card-top": `${cardIndex * spacing}px`,
