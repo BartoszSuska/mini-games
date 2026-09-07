@@ -113,15 +113,29 @@ export function getFoundationIndex(
 export function moveCardToFoundation(
     gameState: GameState,
     card: Card,
-    source: CardSource
+    source: CardSource,
+    foundationIndex: number
 ): GameState {
-    const foundationIndex = getFoundationIndex(
-        card,
-        gameState.foundations
-    )
+    const foundation = gameState.foundations[foundationIndex];
 
-    if(foundationIndex === -1) {
-        return gameState
+    if (!foundation) {
+        return gameState;
+    }
+
+    if (foundation.length === 0) {
+        if (card.rank !== 1) {
+            return gameState;
+        }
+        } else {
+            const topCard = foundation.at(-1);
+
+            if (
+                !topCard ||
+                topCard.suit !== card.suit ||
+                card.rank !== topCard.rank + 1
+            ) {
+                return gameState;
+            }
     }
 
     if(!card.faceUp){
@@ -142,28 +156,83 @@ export function moveCardToFoundation(
         waste = gameState.waste.slice(0, -1)
     }
 
-if (source.type === "tableau") {
-    tableau = gameState.tableau.map(
-        (column, index) => {
-            if (index !== source.columnIndex) {
-                return column;
+    if (source.type === "tableau") {
+        tableau = gameState.tableau.map(
+            (column, index) => {
+                if (index !== source.columnIndex) {
+                    return column;
+                }
+
+                const newColumn = column.slice(0, -1);
+
+                const lastCard = newColumn.at(-1);
+
+                if (lastCard && !lastCard.faceUp) {
+                    newColumn[newColumn.length - 1] = {
+                        ...lastCard,
+                        faceUp: true,
+                    };
+                }
+
+                return newColumn;
             }
+        );
+    }
 
-            const newColumn = column.slice(0, -1);
-
-            const lastCard = newColumn.at(-1);
-
-            if (lastCard && !lastCard.faceUp) {
-                newColumn[newColumn.length - 1] = {
-                    ...lastCard,
-                    faceUp: true,
-                };
-            }
-
-            return newColumn;
-        }
-    );
+    return {
+        ...gameState,
+        waste,
+        tableau,
+        foundations
+    }
 }
+
+export function moveCardToFoundation2(
+  gameState: GameState,
+  card: Card,
+  source: CardSource,
+  foundationIndex: number
+): GameState {
+    if (!card.faceUp) {
+        return gameState;
+    }
+
+    const foundations = gameState.foundations.map(
+        (foundation, index) =>
+        index === foundationIndex
+            ? [...foundation, card]
+            : foundation
+    );
+
+    let waste = gameState.waste;
+    let tableau = gameState.tableau;
+
+    if(source.type === "waste") {
+        waste = gameState.waste.slice(0, -1)
+    }
+
+    if (source.type === "tableau") {
+        tableau = gameState.tableau.map(
+            (column, index) => {
+                if (index !== source.columnIndex) {
+                    return column;
+                }
+
+                const newColumn = column.slice(0, -1);
+
+                const lastCard = newColumn.at(-1);
+
+                if (lastCard && !lastCard.faceUp) {
+                    newColumn[newColumn.length - 1] = {
+                        ...lastCard,
+                        faceUp: true,
+                    };
+                }
+
+                return newColumn;
+            }
+        );
+    }
 
     return {
         ...gameState,

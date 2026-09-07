@@ -2,14 +2,17 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react"
 import type {GameState, Card as CardType} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
-import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation } from "../games/solitaire/game"
+import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, moveCardToFoundation2 } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
 import TopRow from "../games/solitaire/components/TopRow";
+import { DragDropProvider } from "@dnd-kit/react";
 
 function Solitaire() {
   const navigate = useNavigate();
+
+  const DROP_ANIMATION_DURATION = 250
 
   const [gameState, setGameState] = useState<GameState | null>(null)
 
@@ -118,23 +121,76 @@ function Solitaire() {
             } as React.CSSProperties
           }
         >
-          {/* Top row: stock, waste and foundations */}
-          <TopRow
-            stock={gameState.stock}
-            waste={gameState.waste}
-            foundations={gameState.foundations}
-            topRowRef={topRowRef}
-            onStockClick={handleStockClick}
-            onWasteClick={handleWasteClick}
-          />
+          <DragDropProvider
+            onDragEnd={(event) => {
+              const source = event.operation.source;
+              const target = event.operation.target;
 
-          {/* Tableau */}
-          <Tableau
-            tableau={gameState.tableau}
-            cardHeight={cardHeight}
-            availableHeight={tableauHeight}
-            onCardClick={handleTableauCardClick}
-          />
+              if(!source || !target) {
+                return;
+              }
+
+              const cardId = String(source.id).replace("card-", "")
+              const foundationIndex = Number(
+                String(target.id).replace("foundation-", "")
+              )
+
+              const card = 
+                gameState?.waste.find((card) => card.id === cardId) ??
+                gameState?.tableau
+                  .flat()
+                  .find((card) => card.id === cardId)
+
+              if(!card || !gameState){
+                return
+              }
+
+              const sourceType =
+                gameState.waste.some((card) => card.id === cardId)
+                  ? {type: "waste" as const}
+                  : (() => {
+                    const columnIndex = gameState.tableau.findIndex(
+                      (column) =>
+                        column.some((card) => card.id === cardId)
+                    )
+
+                    return {
+                      type: "tableau" as const,
+                      columnIndex,
+                    }
+                  })()
+
+
+              setTimeout(() => {
+                setGameState(
+                  moveCardToFoundation2(
+                    gameState,
+                    card,
+                    sourceType,
+                    foundationIndex
+                  )
+                )                
+              }, DROP_ANIMATION_DURATION)
+            }}
+          >
+            {/* Top row: stock, waste and foundations */}
+            <TopRow
+              stock={gameState.stock}
+              waste={gameState.waste}
+              foundations={gameState.foundations}
+              topRowRef={topRowRef}
+              onStockClick={handleStockClick}
+              onWasteClick={handleWasteClick}
+            />
+
+            {/* Tableau */}
+            <Tableau
+              tableau={gameState.tableau}
+              cardHeight={cardHeight}
+              availableHeight={tableauHeight}
+              onCardClick={handleTableauCardClick}
+            />
+          </DragDropProvider>
         </div>
       )}
     </main>

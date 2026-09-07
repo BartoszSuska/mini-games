@@ -1,6 +1,7 @@
 import type { RefObject } from 'react'
 import type { Card as CardType } from '../types'
 import Card from './Card'
+import Foundation from './Foundation'
 
 type TopRowProps = {
     stock: CardType[];
@@ -88,23 +89,13 @@ function TopRow({
 
         {/* Foundations */}
         <div className="solitaire__foundations">
-            {foundations.map((foundation, index) => {
-                const topCard = foundation.at(-1);
-
-                return (
-                    <div className="solitaire__pile" key={index}>
-                        <h3 className="solitaire__pile-title">
-                            Foundation
-                        </h3>
-
-                        {topCard ? (
-                            <Card card={topCard} />
-                        ) : (
-                            <div className="solitaire__card-placeholder" />
-                        )}
-                    </div>
-                );
-            })}
+            {foundations.map((foundation, index) => (
+                <Foundation
+                    key={index}
+                    foundation={foundation}
+                    index={index}
+                />
+            ))}
         </div>
     </div>
   )
