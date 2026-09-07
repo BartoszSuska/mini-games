@@ -1,4 +1,4 @@
-import type { Card, GameState } from "./types"
+import type { Card, GameState, CardSource } from "./types"
 
 export function dealGame(deck: Card[]): GameState {
     const tableau: Card[][] = [
@@ -89,5 +89,86 @@ export function recycleWaste(gameState: GameState): GameState {
         ...gameState,
         stock,
         waste: []
+    }
+}
+
+export function getFoundationIndex(
+    card: Card,
+    foundations: Card[][]
+): number {
+    return foundations.findIndex((foundation) => {
+        if(foundation.length === 0){
+            return card.rank === 1;
+        }
+
+        const topCard = foundation[foundation.length - 1]
+
+        return (
+            topCard.suit === card.suit &&
+            card.rank === topCard.rank + 1
+        )
+    })
+}
+
+export function moveCardToFoundation(
+    gameState: GameState,
+    card: Card,
+    source: CardSource
+): GameState {
+    const foundationIndex = getFoundationIndex(
+        card,
+        gameState.foundations
+    )
+
+    if(foundationIndex === -1) {
+        return gameState
+    }
+
+    if(!card.faceUp){
+        return gameState
+    }
+
+    const foundations = gameState.foundations.map(
+        (foundation, index) =>
+            index === foundationIndex
+                ? [...foundation, card]
+                : foundation
+    )
+
+    let waste = gameState.waste
+    let tableau = gameState.tableau
+
+    if(source.type === "waste") {
+        waste = gameState.waste.slice(0, -1)
+    }
+
+if (source.type === "tableau") {
+    tableau = gameState.tableau.map(
+        (column, index) => {
+            if (index !== source.columnIndex) {
+                return column;
+            }
+
+            const newColumn = column.slice(0, -1);
+
+            const lastCard = newColumn.at(-1);
+
+            if (lastCard && !lastCard.faceUp) {
+                newColumn[newColumn.length - 1] = {
+                    ...lastCard,
+                    faceUp: true,
+                };
+            }
+
+            return newColumn;
+        }
+    );
+}
+
+    return {
+        ...gameState,
+        waste,
+        tableau,
+        foundations
     }
 }

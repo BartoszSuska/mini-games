@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react"
-import type {GameState} from "../games/solitaire/types"
+import type {GameState, Card as CardType} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
-import { dealGame, drawFromStock, recycleWaste } from "../games/solitaire/game"
+import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
@@ -48,6 +48,48 @@ function Solitaire() {
     setGameState(recycleWaste(gameState))
   }
 
+  function handleWasteClick() {
+    console.log("TEST")
+
+    if(!gameState){
+      return
+    }
+
+    const card = gameState.waste.at(-1)
+
+    if(!card){
+      return
+    }
+
+    setGameState(
+      moveCardToFoundation(
+        gameState,
+        card,
+        {type: "waste"}
+      )
+    )
+  }
+
+  function handleTableauCardClick(
+    card: CardType,
+    columnIndex: number
+  ) {
+    if (!gameState) {
+      return;
+    }
+
+    setGameState(
+      moveCardToFoundation(
+        gameState,
+        card,
+        {
+          type: "tableau",
+          columnIndex,
+        }
+      )
+    );
+  }
+
   return (
     <main className="solitaire">
       <header className="solitaire__header">
@@ -83,6 +125,7 @@ function Solitaire() {
             foundations={gameState.foundations}
             topRowRef={topRowRef}
             onStockClick={handleStockClick}
+            onWasteClick={handleWasteClick}
           />
 
           {/* Tableau */}
@@ -90,6 +133,7 @@ function Solitaire() {
             tableau={gameState.tableau}
             cardHeight={cardHeight}
             availableHeight={tableauHeight}
+            onCardClick={handleTableauCardClick}
           />
         </div>
       )}

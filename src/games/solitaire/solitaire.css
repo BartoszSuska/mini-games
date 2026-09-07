@@ -123,6 +123,23 @@
     position: static;
 }
 
+.solitaire__waste {
+    position: relative;
+    width: calc(
+        var(--card-width) +
+        (var(--card-width) * 0.35 * 2)
+    );
+    height: var(--card-height);
+}
+
+.solitaire__waste-card {
+    position: absolute;
+    top: 0;
+    left: calc(
+        var(--waste-index) * var(--card-width) * 0.35
+    );
+}
+
 /* .solitaire__card--stacked {
     margin-top: -100px;
 } */

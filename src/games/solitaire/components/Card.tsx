@@ -4,9 +4,10 @@ type CardProps = {
     card: CardType;
     className?: string;
     style?: React.CSSProperties;
+    onClick?: () => void;
 }
 
-function Card({ card, className = "", style }: CardProps) {
+function Card({ card, className = "", style, onClick }: CardProps) {
   return (
     <img
       className={`solitaire__card ${className}`}
@@ -17,6 +18,7 @@ function Card({ card, className = "", style }: CardProps) {
       }
       alt={`${card.value} ${card.suit}`}
       style={style}
+      onClick={onClick}
     />
   );
 }

@@ -7,7 +7,8 @@ type TopRowProps = {
     waste: CardType[];
     foundations: CardType[][];
     topRowRef: RefObject<HTMLDivElement | null>;
-    onStockClick: any
+    onStockClick: () => void;
+    onWasteClick: () => void;
 };
 
 function TopRow({
@@ -15,8 +16,12 @@ function TopRow({
     waste,
     foundations,
     topRowRef,
-    onStockClick
+    onStockClick,
+    onWasteClick
 }: TopRowProps) {
+
+    const visibleWaste = waste.slice(-3);
+
   return (
     <div 
         className="solitaire__top-row"
@@ -50,30 +55,56 @@ function TopRow({
                 <h3 className="solitaire__pile-title">
                     Waste
                 </h3>
-
-                {waste.length > 0 ? (
-                    <Card
-                        card={waste[waste.length - 1]}
-                    />
-                ) : (
+                <div className="solitaire__waste">
+                {visibleWaste.length === 0 ? (
                     <div className="solitaire__card-placeholder" />
+                ) : (
+                    visibleWaste.map((card, index) => {
+                        const isTopWasteCard = index === visibleWaste.length - 1;
+
+                        return (
+                            <Card
+                                key={card.id}
+                                card={card}
+                                className="solitaire__waste-card"
+                                onClick={
+                                    isTopWasteCard
+                                        ? onWasteClick
+                                        : undefined
+                                }
+                                style={
+                                    {
+                                        "--waste-index": index,
+                                    } as React.CSSProperties
+                                }
+                            />
+                        )
+
+                    })
                 )}
+                </div>
             </div>
         </div>
 
         {/* Foundations */}
         <div className="solitaire__foundations">
-            {foundations.map(
-            (_, index) => (
-                <div className="solitaire__pile" key={index}>
-                    <h3 className="solitaire__pile-title">
-                        Foundation
-                    </h3>
+            {foundations.map((foundation, index) => {
+                const topCard = foundation.at(-1);
 
-                    <div className="solitaire__card-placeholder" />
-                </div>
-            )
-            )}
+                return (
+                    <div className="solitaire__pile" key={index}>
+                        <h3 className="solitaire__pile-title">
+                            Foundation
+                        </h3>
+
+                        {topCard ? (
+                            <Card card={topCard} />
+                        ) : (
+                            <div className="solitaire__card-placeholder" />
+                        )}
+                    </div>
+                );
+            })}
         </div>
     </div>
   )

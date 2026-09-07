@@ -6,6 +6,7 @@ type TableauProps = {
   tableau: CardType[][];
   cardHeight: number;
   availableHeight: number;
+  onCardClick: (card: CardType, columnIndex: number) => void;
 };
 
 const MIN_CARD_SPACING_RATIO = 0.08;
@@ -15,6 +16,7 @@ function Tableau({
   tableau,
   cardHeight,
   availableHeight,
+  onCardClick,
 }: TableauProps) {
   return (
     <div className="solitaire__tableau">
@@ -45,18 +47,31 @@ function Tableau({
               height: `${columnHeight}px`,
             }}
           >
-            {column.map((card, cardIndex) => (
-              <Card
-                key={card.id}
-                card={card}
-                className="solitaire__tableau-card"
-                style={
-                  {
-                    "--card-top": `${cardIndex * spacing}px`,
-                  } as React.CSSProperties
-                }
-              />
-            ))}
+            {column.length === 0 ? (
+              <div className="solitaire__card-placeholder" />
+            ) : (
+              column.map((card, cardIndex) => {
+                const isTopCard = cardIndex === column.length - 1;
+
+                return (
+                  <Card
+                    key={card.id}
+                    card={card}
+                    className="solitaire__tableau-card"
+                    onClick={
+                      isTopCard
+                        ? () => onCardClick(card, columnIndex)
+                        : undefined
+                    }
+                    style={
+                      {
+                        "--card-top": `${cardIndex * spacing}px`,
+                      } as React.CSSProperties
+                    }
+                  />
+                );
+              })
+            )}
           </div>
         );
       })}
