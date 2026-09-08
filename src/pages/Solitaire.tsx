@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react"
 import type {GameState, Card as CardType} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
-import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, getFoundationIndex } from "../games/solitaire/game"
+import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, getFoundationIndex, moveCardToTableau } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
@@ -142,14 +142,15 @@ function Solitaire() {
               const source = event.operation.source;
               const target = event.operation.target;
 
-              if(!source || !target) {
+              if(!source || !target || !gameState) {
                 return;
               }
 
+              const sourceId = String(source.id)
+              const targetId = String(target.id)              
+
               const cardId = String(source.id).replace("card-", "")
-              const foundationIndex = Number(
-                String(target.id).replace("foundation-", "")
-              )
+
 
               const card = 
                 gameState?.waste.find((card) => card.id === cardId) ??
@@ -157,7 +158,7 @@ function Solitaire() {
                   .flat()
                   .find((card) => card.id === cardId)
 
-              if(!card || !gameState){
+              if(!card){
                 return
               }
 
@@ -176,14 +177,44 @@ function Solitaire() {
                     }
                   })()
 
-              setGameState(
-                moveCardToFoundation(
-                  gameState,
-                  card,
-                  sourceType,
-                  foundationIndex
+              //Drop on foundation
+              if (targetId.startsWith("foundation-")) {
+                console.log(targetId)
+                const foundationIndex = Number(
+                  String(target.id).replace("foundation-", "")
                 )
-              )     
+              
+                setGameState(
+                  moveCardToFoundation(
+                    gameState,
+                    card,
+                    sourceType,
+                    foundationIndex
+                  )
+                )
+                
+                return
+              }
+
+              //Drop on tableau
+              if(targetId.startsWith("tableau-")) {
+                console.log(targetId)
+
+                const targetColumnIndex = Number(
+                  targetId.replace("tableau-", "")
+                )
+
+                setGameState(
+                  moveCardToTableau(
+                    gameState,
+                    card,
+                    sourceType,
+                    targetColumnIndex
+                  )
+                )
+
+                return
+              }
             }}
           >
             {/* Top row: stock, waste and foundations */}

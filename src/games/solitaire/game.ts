@@ -187,7 +187,7 @@ export function moveCardToFoundation(
     }
 }
 
-export function moveCardToFoundation2(
+export function moveCardToFoundationWithoutGameRules(
   gameState: GameState,
   card: Card,
   source: CardSource,
@@ -239,5 +239,88 @@ export function moveCardToFoundation2(
         waste,
         tableau,
         foundations
+    }
+}
+
+export function moveCardToTableau(
+    gameState: GameState,
+    card: Card,
+    source: CardSource,
+    targetColumnIndex: number
+): GameState {
+    if(!card.faceUp){
+        return gameState
+    }
+
+    if(targetColumnIndex < 0 || targetColumnIndex >= gameState.tableau.length) {
+        return gameState
+    }
+
+    let cardsToMove: Card[] = []
+
+    if(source.type === "tableau") {
+        if(source.columnIndex === targetColumnIndex){
+            return gameState
+        }
+
+        const sourceColumn = gameState.tableau[source.columnIndex]
+        
+        const cardIndex = sourceColumn.findIndex(
+            (sourceCard) => sourceCard.id === card.id
+        )
+
+        if(cardIndex === -1){
+            return gameState
+        }
+
+        cardsToMove = sourceColumn.slice(cardIndex)
+    } else{
+        cardsToMove = [card]
+    }
+
+    let tableau = gameState.tableau.map( 
+        (column, index) => { 
+            if ( source.type === "tableau" && index === source.columnIndex ) 
+            { 
+                const cardIndex = column.findIndex( 
+                    (sourceCard) => sourceCard.id === card.id ); 
+                    
+                    if (cardIndex === -1) 
+                    { 
+                        return column; 
+                    } 
+                    const newColumn = column.slice(0, cardIndex); 
+                    const lastCard = newColumn.at(-1); 
+                    
+                    if (lastCard && !lastCard.faceUp) 
+                    { 
+                        newColumn[newColumn.length - 1] = { ...lastCard, faceUp: true, }; 
+                    } 
+                    return newColumn; 
+                } 
+                return column; 
+            } 
+        );    
+
+    tableau = tableau.map(
+        (column, index) => {
+            if(index === targetColumnIndex){
+                return [...column, ...cardsToMove]
+            }
+
+            return column
+        }
+    )
+
+    let waste = gameState.waste
+
+    if(source.type === "waste"){
+        waste = gameState.waste.slice(0, -1)
+    }
+
+    return {
+        ...gameState,
+        waste,
+        tableau,
     }
 }
