@@ -84,6 +84,13 @@
     flex-shrink: 0;
 }
 
+.solitaire__foundation-drop-zone {
+    width: var(--card-width);
+    height: var(--card-height);
+    box-sizing: border-box;
+    position: relative;
+}
+
 .solitaire__tableau {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));

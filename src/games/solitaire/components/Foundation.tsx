@@ -28,7 +28,11 @@ function Foundation({
                 data-foundation-index={index}
             >
                 {topCard ? (
-                    <Card card={topCard} />
+                    <img
+                        className="solitaire__card"
+                        src={topCard.image}
+                        alt={`${topCard.value} ${topCard.suit}`}
+                    />
                 ) : (
                     <div className="solitaire__card-placeholder" />
                 )}

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react"
 import type {GameState, Card as CardType} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
-import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, moveCardToFoundation2 } from "../games/solitaire/game"
+import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, getFoundationIndex } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
@@ -11,8 +11,6 @@ import { DragDropProvider } from "@dnd-kit/react";
 
 function Solitaire() {
   const navigate = useNavigate();
-
-  const DROP_ANIMATION_DURATION = 250
 
   const [gameState, setGameState] = useState<GameState | null>(null)
 
@@ -52,8 +50,6 @@ function Solitaire() {
   }
 
   function handleWasteClick() {
-    console.log("TEST")
-
     if(!gameState){
       return
     }
@@ -64,11 +60,21 @@ function Solitaire() {
       return
     }
 
+    const foundationIndex = getFoundationIndex(
+      card,
+      gameState.foundations
+    )
+
+    if(foundationIndex === -1) {
+      return
+    }
+
     setGameState(
       moveCardToFoundation(
         gameState,
         card,
-        {type: "waste"}
+        {type: "waste"},
+        foundationIndex
       )
     )
   }
@@ -81,6 +87,15 @@ function Solitaire() {
       return;
     }
 
+    const foundationIndex = getFoundationIndex(
+      card,
+      gameState.foundations
+    )
+
+    if(foundationIndex === -1) {
+      return
+    }
+
     setGameState(
       moveCardToFoundation(
         gameState,
@@ -88,7 +103,8 @@ function Solitaire() {
         {
           type: "tableau",
           columnIndex,
-        }
+        },
+        foundationIndex
       )
     );
   }
@@ -160,17 +176,14 @@ function Solitaire() {
                     }
                   })()
 
-
-              setTimeout(() => {
-                setGameState(
-                  moveCardToFoundation2(
-                    gameState,
-                    card,
-                    sourceType,
-                    foundationIndex
-                  )
-                )                
-              }, DROP_ANIMATION_DURATION)
+              setGameState(
+                moveCardToFoundation(
+                  gameState,
+                  card,
+                  sourceType,
+                  foundationIndex
+                )
+              )     
             }}
           >
             {/* Top row: stock, waste and foundations */}
