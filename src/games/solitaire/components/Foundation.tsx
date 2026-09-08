@@ -18,9 +18,7 @@ function Foundation({
 
     return (
         <div className="solitaire__pile">
-            <h3 className="solitaire__pile-title">
-                Foundation
-            </h3>
+
 
             <div
                 ref={ref}

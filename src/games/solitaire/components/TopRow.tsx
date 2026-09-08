@@ -35,9 +35,6 @@ function TopRow({
         <div className="solitaire__top-left">
             {/* Stock */}
             <div className="solitaire__pile">
-                <h3 className="solitaire__pile-title">
-                    Stock
-                </h3>
 
                 {stock.length > 0 ? (
                     <img
@@ -57,9 +54,6 @@ function TopRow({
 
             {/* Waste */}
             <div className="solitaire__pile">
-                <h3 className="solitaire__pile-title">
-                    Waste
-                </h3>
                 <div className="solitaire__waste">
                 {visibleWaste.length === 0 ? (
                     <div className="solitaire__card-placeholder" />

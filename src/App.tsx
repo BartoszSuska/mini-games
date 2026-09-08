@@ -6,7 +6,7 @@ import './App.css'
 function App() {
 
   return ( 
-    <BrowserRouter>
+    <BrowserRouter basename="/mini-games">
       <Routes>
         <Route path="/" element={<MainMenu />} />
         <Route path="/solitaire" element={<Solitaire />} />
