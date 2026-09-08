@@ -37,7 +37,7 @@ export function createDeck(): Card[] {
                 suit,
                 rank,
                 value,
-                image: `/cards/card_${suit}_${value}.png`,
+                image: `/mini-games/cards/card_${suit}_${value}.png`,
                 faceUp: false
             })
         }

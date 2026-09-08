@@ -39,7 +39,7 @@ function TopRow({
                 {stock.length > 0 ? (
                     <img
                     className="solitaire__card solitaire__stock-card"
-                    src="/cards/card_back.png"
+                    src="/mini-games/cards/card_back.png"
                     alt="Stock"
                     onClick={onStockClick}
                     />

@@ -27,7 +27,7 @@ function Card({ card, className = "", style, onClick, draggable=true, invalid=fa
       src={
         card.faceUp
           ? card.image
-          : "/cards/card_back.png"
+          : "/mini-games/cards/card_back.png"
       }
       alt={`${card.value} ${card.suit}`}
       draggable={false}
