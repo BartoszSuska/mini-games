@@ -15,6 +15,7 @@ function Solitaire() {
 
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [invalidCardId, setInvalidCardId] = useState<string | null>(null)
   const DROP_ANIMATION_DURATION = 250
 
   const {
@@ -69,6 +70,10 @@ function Solitaire() {
     )
 
     if(foundationIndex === -1) {
+      setInvalidCardId(card.id)
+      setTimeout(() => {
+        setInvalidCardId(null)
+      }, 350)
       return
     }
 
@@ -96,6 +101,10 @@ function Solitaire() {
     )
 
     if(foundationIndex === -1) {
+      setInvalidCardId(card.id)
+      setTimeout(() => {
+        setInvalidCardId(null)
+      }, 350)
       return
     }
 
@@ -332,6 +341,7 @@ function Solitaire() {
               onStockClick={handleStockClick}
               onWasteClick={handleWasteClick}
               activeDragId={activeDragId}
+              invalidCardId={invalidCardId}
             />
 
             {/* Tableau */}
@@ -341,6 +351,7 @@ function Solitaire() {
               availableHeight={tableauHeight}
               onCardClick={handleTableauCardClick}
               activeDragId={activeDragId}
+              invalidCardId={invalidCardId}
             />
 
             <DragOverlay>

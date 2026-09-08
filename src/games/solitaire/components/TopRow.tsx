@@ -11,6 +11,7 @@ type TopRowProps = {
     onStockClick: () => void;
     onWasteClick: () => void;
     activeDragId: string | null;
+    invalidCardId: string | null;
 };
 
 function TopRow({
@@ -20,7 +21,8 @@ function TopRow({
     topRowRef,
     onStockClick,
     onWasteClick,
-    activeDragId
+    activeDragId,
+    invalidCardId
 }: TopRowProps) {
 
     const visibleWaste = waste.slice(-3);
@@ -73,6 +75,7 @@ function TopRow({
                                 card={card}
                                 className="solitaire__waste-card"
                                 draggable={isTopWasteCard}
+                                invalid={invalidCardId===card.id}
                                 onClick={
                                     isTopWasteCard
                                         ? onWasteClick

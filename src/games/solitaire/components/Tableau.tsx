@@ -9,6 +9,7 @@ type TableauProps = {
   availableHeight: number;
   onCardClick: (card: CardType, columnIndex: number) => void;
   activeDragId: string | null;
+  invalidCardId: string | null;
 };
 
 type TableauColumnProps = {
@@ -18,6 +19,7 @@ type TableauColumnProps = {
   availableHeight: number;
   onCardClick: (card: CardType, columnIndex: number) => void;
   activeDragId: string | null;
+  invalidCardId: string | null;
 }
 
 const MIN_CARD_SPACING_RATIO = 0.08;
@@ -30,6 +32,7 @@ function TableauColumn({
   availableHeight,
   onCardClick,
   activeDragId,
+  invalidCardId,
 }: TableauColumnProps) {
   const { ref } = useDroppable({
     id: `tableau-${columnIndex}`
@@ -80,6 +83,7 @@ function TableauColumn({
               key={card.id}
               card={card}
               className="solitaire__tableau-card"
+              invalid={invalidCardId === card.id}
               onClick={
                 isTopCard
                   ? () => onCardClick(card, columnIndex)
@@ -105,6 +109,7 @@ function Tableau({
   availableHeight,
   onCardClick,
   activeDragId,
+  invalidCardId,
 }: TableauProps) {
   return (
     <div className="solitaire__tableau">
@@ -117,6 +122,7 @@ function Tableau({
           availableHeight={availableHeight}
           onCardClick={onCardClick}
           activeDragId={activeDragId}
+          invalidCardId={invalidCardId}
         />
       ))}
     </div>

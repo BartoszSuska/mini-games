@@ -8,9 +8,10 @@ type CardProps = {
     style?: CSSProperties;
     onClick?: () => void;
     draggable?: boolean;
+    invalid?: boolean;
 }
 
-function Card({ card, className = "", style, onClick, draggable=true }: CardProps) {
+function Card({ card, className = "", style, onClick, draggable=true, invalid=false }: CardProps) {
   const {ref, isDragging} = useDraggable({
     id: `card-${card.id}`,
     disabled: !card.faceUp || !draggable,
@@ -22,7 +23,7 @@ function Card({ card, className = "", style, onClick, draggable=true }: CardProp
   return (
     <img
       ref={ref}
-      className={`solitaire__card ${className}`}
+      className={`solitaire__card ${className} ${invalid ? "solitaire__card--invalid-move":""}`}
       src={
         card.faceUp
           ? card.image
