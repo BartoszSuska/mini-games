@@ -7,12 +7,13 @@ type CardProps = {
     className?: string;
     style?: CSSProperties;
     onClick?: () => void;
+    draggable?: boolean;
 }
 
-function Card({ card, className = "", style, onClick }: CardProps) {
+function Card({ card, className = "", style, onClick, draggable=true }: CardProps) {
   const {ref, isDragging} = useDraggable({
     id: `card-${card.id}`,
-    disabled: !card.faceUp,
+    disabled: !card.faceUp || !draggable,
     data: {
       cardId: card.id,
     }
@@ -31,7 +32,7 @@ function Card({ card, className = "", style, onClick }: CardProps) {
       draggable={false}
       style={{
         ...style,
-        opacity: isDragging ? 0.75 : 1
+        opacity: isDragging ? 0 : 1
       }}
       onClick={onClick}
     />

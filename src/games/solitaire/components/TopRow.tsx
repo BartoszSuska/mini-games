@@ -10,6 +10,7 @@ type TopRowProps = {
     topRowRef: RefObject<HTMLDivElement | null>;
     onStockClick: () => void;
     onWasteClick: () => void;
+    activeDragId: string | null;
 };
 
 function TopRow({
@@ -18,7 +19,8 @@ function TopRow({
     foundations,
     topRowRef,
     onStockClick,
-    onWasteClick
+    onWasteClick,
+    activeDragId
 }: TopRowProps) {
 
     const visibleWaste = waste.slice(-3);
@@ -63,11 +65,14 @@ function TopRow({
                     visibleWaste.map((card, index) => {
                         const isTopWasteCard = index === visibleWaste.length - 1;
 
+                        const isBeingDragged = activeDragId === `card-${card.id}`
+
                         return (
                             <Card
                                 key={card.id}
                                 card={card}
                                 className="solitaire__waste-card"
+                                draggable={isTopWasteCard}
                                 onClick={
                                     isTopWasteCard
                                         ? onWasteClick
@@ -76,6 +81,9 @@ function TopRow({
                                 style={
                                     {
                                         "--waste-index": index,
+                                        visibility: isBeingDragged
+                                            ? "hidden"
+                                            : "visible",
                                     } as React.CSSProperties
                                 }
                             />

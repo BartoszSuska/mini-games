@@ -7,12 +7,15 @@ import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"
 import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
 import TopRow from "../games/solitaire/components/TopRow";
-import { DragDropProvider } from "@dnd-kit/react";
+import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
+import VictoryModal from "../games/solitaire/components/VictoryModal";
 
 function Solitaire() {
   const navigate = useNavigate();
 
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const DROP_ANIMATION_DURATION = 250
 
   const {
     boardRef,
@@ -109,6 +112,99 @@ function Solitaire() {
     );
   }
 
+  function SolitaireDragOverlay({
+    gameState,
+    cardWidth,
+    cardHeight,
+    sourceId,
+  }: {
+    gameState: GameState;
+    cardWidth: number;
+    cardHeight: number;
+    sourceId: string;
+  }) {
+    const cardId = sourceId.replace("card-", "")
+
+    //waste
+    const wasteCard = gameState.waste.find(
+      (card) => card.id === cardId
+    )
+
+    if(wasteCard){
+      return (
+        <img
+          className="solitaire__drag-overlay-card"
+          src={wasteCard.image}
+          alt={`${wasteCard.value} ${wasteCard.suit}`}
+          draggable={false}
+        />
+      )
+    }
+
+    //tableau
+    const columnIndex = gameState.tableau.findIndex(
+      (column) => column.some((card) => card.id === cardId)
+    )
+
+    if(columnIndex === -1){
+      return null
+    }
+
+    const column = gameState.tableau[columnIndex]
+
+    const cardIndex = column.findIndex(
+      (card) => card.id === cardId
+    )
+
+    if(cardIndex === -1){
+      return null
+    }
+
+    //take all cards from dragged card to end of column
+    const cardsToMove = column.slice(cardIndex)
+
+    const spacing = Math.min(
+      cardHeight * 0.25,
+      Math.max(
+        cardHeight * 0.08,
+        (window.innerHeight - cardHeight) /
+          Math.max(1, cardsToMove.length - 1)
+      )
+    )
+
+    return (
+      <div
+        className="solitaire__drag-overlay-stack"
+        style={{
+          width: `${cardWidth}px`,
+          height: `${
+            cardHeight +
+            Math.max(0, cardsToMove.length - 1) * spacing
+          }px`,
+        }}
+      >
+        {cardsToMove.map((card, index) => (
+          <img
+            key={card.id}
+            className="solitaire__drag-overlay-card"
+            src={card.image}
+            alt={`${card.value} ${card.suit}`}
+            draggable={false}
+            style={{
+              top: `${index * spacing}px`
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  function isGameWon(gameState: GameState): boolean {
+    return gameState.foundations.every(
+      (foundation) => foundation.length === 13
+    )
+  }
+
   return (
     <main className="solitaire">
       <header className="solitaire__header">
@@ -138,7 +234,17 @@ function Solitaire() {
           }
         >
           <DragDropProvider
+            onDragStart={(event) => {
+              const source = event.operation.source;
+              if(!source)
+                return
+
+              setActiveDragId(String(source.id))
+            }}
             onDragEnd={(event) => {
+                setTimeout(() => {
+                  setActiveDragId(null);
+                }, DROP_ANIMATION_DURATION)
               const source = event.operation.source;
               const target = event.operation.target;
 
@@ -225,6 +331,7 @@ function Solitaire() {
               topRowRef={topRowRef}
               onStockClick={handleStockClick}
               onWasteClick={handleWasteClick}
+              activeDragId={activeDragId}
             />
 
             {/* Tableau */}
@@ -233,8 +340,32 @@ function Solitaire() {
               cardHeight={cardHeight}
               availableHeight={tableauHeight}
               onCardClick={handleTableauCardClick}
+              activeDragId={activeDragId}
             />
+
+            <DragOverlay>
+              {(source) => {
+                if(!gameState) {
+                  return null
+                }
+
+                return (
+                  <SolitaireDragOverlay
+                    gameState={gameState}
+                    cardWidth={cardWidth}
+                    cardHeight={cardHeight}
+                    sourceId={String(source.id)}
+                  />
+                )
+              }}
+            </DragOverlay>
           </DragDropProvider>
+
+          {isGameWon(gameState) && (
+            <VictoryModal
+              onNewGame={startNewGame}
+            />
+          )}
         </div>
       )}
     </main>

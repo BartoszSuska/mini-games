@@ -1,4 +1,5 @@
 import type { Card, GameState, CardSource } from "./types"
+import { getCardColor } from "./card"
 
 export function dealGame(deck: Card[]): GameState {
     const tableau: Card[][] = [
@@ -242,6 +243,27 @@ export function moveCardToFoundationWithoutGameRules(
     }
 }
 
+function canPlaceOnTableau(
+    card: Card,
+    targetColumn: Card[]
+): boolean {
+    const topCard = targetColumn.at(-1)
+
+    if(!topCard){
+        return card.rank === 13
+    }
+
+    if(card.rank !== topCard.rank -1){
+        return false
+    }
+
+    if(getCardColor(card.suit) === getCardColor(topCard.suit)){
+        return false
+    }
+
+    return true
+}
+
 export function moveCardToTableau(
     gameState: GameState,
     card: Card,
@@ -253,6 +275,12 @@ export function moveCardToTableau(
     }
 
     if(targetColumnIndex < 0 || targetColumnIndex >= gameState.tableau.length) {
+        return gameState
+    }
+
+    const targetColumn = gameState.tableau[targetColumnIndex]
+
+    if(!canPlaceOnTableau(card, targetColumn)){
         return gameState
     }
 

@@ -8,6 +8,7 @@ type TableauProps = {
   cardHeight: number;
   availableHeight: number;
   onCardClick: (card: CardType, columnIndex: number) => void;
+  activeDragId: string | null;
 };
 
 type TableauColumnProps = {
@@ -16,6 +17,7 @@ type TableauColumnProps = {
   cardHeight: number;
   availableHeight: number;
   onCardClick: (card: CardType, columnIndex: number) => void;
+  activeDragId: string | null;
 }
 
 const MIN_CARD_SPACING_RATIO = 0.08;
@@ -27,6 +29,7 @@ function TableauColumn({
   cardHeight,
   availableHeight,
   onCardClick,
+  activeDragId,
 }: TableauColumnProps) {
   const { ref } = useDroppable({
     id: `tableau-${columnIndex}`
@@ -46,6 +49,13 @@ function TableauColumn({
 
   const columnHeight = Math.max(0, column.length - 1) * spacing + cardHeight
 
+  const activeCardId = activeDragId?.replace("card-", "")
+
+  const activeCardIndex = activeCardId
+    ? column.findIndex((card) => card.id === activeCardId)
+    : -1
+
+
   return (
     <div
       ref={ref}
@@ -60,14 +70,11 @@ function TableauColumn({
         
         column.map((card, cardIndex) => {
           const isTopCard = cardIndex === column.length -1
-          if(card.faceUp){
-            console.log(
-              "COLUMN",
-              columnIndex,
-              column.map(card => card.id)
-            ); 
-          }
+          const isBeingDragged =
+            activeCardIndex !== -1 &&
+            cardIndex >= activeCardIndex
  
+
           return (
             <Card
               key={card.id}
@@ -81,6 +88,7 @@ function TableauColumn({
               style={
                 {
                   "--card-top": `${cardIndex * spacing}px`,
+                  visibility: isBeingDragged ? "hidden" : "visible"
                 } as React.CSSProperties
               }
             />
@@ -96,6 +104,7 @@ function Tableau({
   cardHeight,
   availableHeight,
   onCardClick,
+  activeDragId,
 }: TableauProps) {
   return (
     <div className="solitaire__tableau">
@@ -107,6 +116,7 @@ function Tableau({
           cardHeight={cardHeight}
           availableHeight={availableHeight}
           onCardClick={onCardClick}
+          activeDragId={activeDragId}
         />
       ))}
     </div>

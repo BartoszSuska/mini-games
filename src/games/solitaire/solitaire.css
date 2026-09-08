@@ -1,128 +1,238 @@
 .solitaire {
     height: 100dvh;
     min-height: 0;
+
     padding: clamp(10px, 3vw, 30px);
+
     box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
+
     overflow: hidden;
 }
+
+/* =========================
+   Header
+   ========================= */
 
 .solitaire__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     margin-bottom: 20px;
+
     flex-shrink: 0;
 }
 
-.solitaire__back-button {
+.solitaire__header h1 {
+    margin: 0;
+}
+
+.solitaire__back-button,
+.solitaire__new-game-button {
     padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--bg);
+    color: var(--text-h);
+
+    font: inherit;
     font-size: 16px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.solitaire__back-button:hover,
+.solitaire__new-game-button:hover {
+    background: var(--accent-bg);
+    border-color: var(--accent-border);
+    color: var(--accent);
+}
+
+.solitaire__back-button:active,
+.solitaire__new-game-button:active {
+    transform: translateY(1px);
 }
 
 .solitaire__new-game-button {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
 }
 
-.solitaire__board{
+.solitaire__new-game-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    filter: brightness(1.08);
+}
+
+
+/* =========================
+   Board
+   ========================= */
+
+.solitaire__board {
     width: 100%;
+
     display: flex;
     flex-direction: column;
+
     gap: var(--board-gap);
 
     flex: 1;
     min-height: 0;
 }
 
+
+/* =========================
+   Top row
+   ========================= */
+
 .solitaire__top-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+
     width: 100%;
+
     gap: var(--top-row-gap);
+
     flex-shrink: 0;
 }
 
 .solitaire__top-left {
     display: flex;
+
     gap: var(--top-row-gap);
+
     flex-shrink: 0;
 }
 
 .solitaire__pile {
     display: flex;
     flex-direction: column;
+
     gap: 8px;
+
     text-align: center;
 }
 
 .solitaire__pile-title {
     margin: 0;
+
+    color: var(--text);
+
     font-size: 14px;
+    font-weight: 500;
 }
+
+
+/* =========================
+   Card placeholders
+   ========================= */
 
 .solitaire__card-placeholder {
     width: var(--card-width);
     height: var(--card-height);
-    border: 2px dashed #999;
-    border-radius: 8px;
+
     box-sizing: border-box;
+
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+
+    background: var(--accent-bg);
 }
+
+
+/* =========================
+   Foundations
+   ========================= */
 
 .solitaire__foundations {
     display: flex;
+
     gap: var(--top-row-gap);
+
     margin-left: auto;
+
     flex-shrink: 0;
 }
 
 .solitaire__foundation-drop-zone {
     width: var(--card-width);
     height: var(--card-height);
+
     box-sizing: border-box;
+
     position: relative;
 }
 
+
+/* =========================
+   Tableau
+   ========================= */
+
 .solitaire__tableau {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    grid-template-columns: repeat(
+        7,
+        minmax(0, 1fr)
+    );
+
     gap: var(--tableau-gap);
+
     align-items: flex-start;
 
     width: 100%;
-    flex: 1;
 
+    flex: 1;
     min-height: 0;
+
     position: relative;
 }
 
 .solitaire__column {
     width: 100%;
-    /* min-height: 140px; */
+
     position: relative;
+
     min-width: 0;
 }
+
+
+/* =========================
+   Cards
+   ========================= */
 
 .solitaire__card {
     width: var(--card-width);
     height: var(--card-height);
+
     display: block;
 
     user-select: none;
 }
 
-.solitaire__tableau-card{
+.solitaire__tableau-card {
     position: absolute;
+
     left: 50%;
+
     transform: translateX(-50%);
+
     top: var(--card-top);
 }
 
@@ -130,66 +240,278 @@
     position: static;
 }
 
+
+/* =========================
+   Waste
+   ========================= */
+
 .solitaire__waste {
     position: relative;
+
     width: calc(
         var(--card-width) +
         (var(--card-width) * 0.35 * 2)
     );
+
     height: var(--card-height);
 }
 
 .solitaire__waste-card {
     position: absolute;
+
     top: 0;
+
     left: calc(
-        var(--waste-index) * var(--card-width) * 0.35
+        var(--waste-index) *
+        var(--card-width) *
+        0.35
     );
 }
 
-/* .solitaire__card--stacked {
-    margin-top: -100px;
-} */
 
-/* smaller screens */
-@media (max-width: 700px) {
-  .solitaire {
-    padding: 10px;
-  }
+/* =========================
+   Drag overlay
+   ========================= */
 
-  .solitaire__header {
-    margin-bottom: 10px;
-  }
+.solitaire__drag-overlay-stack {
+    position: relative;
 
-  .solitaire__top-row {
-    gap: 10px;
-  }
-
-  .solitaire__top-left {
-    gap: 10px;
-  }
-
-  .solitaire__foundations {
-    gap: 8px;
-  }
-
-  .solitaire__pile-title {
-    display: none;
-  }
-
-  .solitaire__board {
-    gap: 15px;
-  }
+    pointer-events: none;
 }
-/* possible layout for smaller screens, but not used for now. It basically change the layout so the stock and waste are above foundations but still 7 columns take most of the space */
-/* @media (max-width: 550px) {
+
+.solitaire__drag-overlay-card {
+    position: absolute;
+
+    left: 0;
+
+    width: var(--card-width);
+    height: var(--card-height);
+
+    display: block;
+
+    user-select: none;
+
+    opacity: 0.75;
+}
+
+
+/* =========================
+   Victory modal
+   ========================= */
+
+.solitaire__victory-backdrop {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1000;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: rgba(8, 6, 13, 0.55);
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.solitaire__victory-modal {
+    width: min(100%, 420px);
+
+    max-height: calc(100dvh - 40px);
+
+    padding: 36px 32px 32px;
+
+    box-sizing: border-box;
+
+    overflow-y: auto;
+
+    background: var(--bg);
+
+    border: 1px solid var(--accent-border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.2),
+        0 0 0 1px var(--accent-bg);
+
+    text-align: center;
+}
+
+.solitaire__victory-modal h2 {
+    margin: 0 0 24px;
+
+    color: var(--text-h);
+
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.solitaire__victory-actions {
+    display: flex;
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.solitaire__victory-actions button {
+    min-height: 42px;
+
+    padding: 10px 18px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--bg);
+    color: var(--text-h);
+
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.solitaire__victory-actions button:hover {
+    background: var(--accent-bg);
+
+    border-color: var(--accent-border);
+
+    color: var(--accent);
+}
+
+.solitaire__victory-actions button:active {
+    transform: translateY(1px);
+}
+
+.solitaire__victory-actions button:last-child {
+    background: var(--accent);
+
+    border-color: var(--accent);
+
+    color: white;
+}
+
+.solitaire__victory-actions button:last-child:hover {
+    background: var(--accent);
+
+    border-color: var(--accent);
+
+    color: white;
+
+    filter: brightness(1.08);
+}
+
+
+/* =========================
+   Smaller screens
+   ========================= */
+
+@media (max-width: 700px) {
+    .solitaire {
+        padding: 10px;
+    }
+
+    .solitaire__header {
+        margin-bottom: 10px;
+    }
+
+    .solitaire__header h1 {
+        font-size: 28px;
+    }
+
+    .solitaire__back-button,
+    .solitaire__new-game-button {
+        padding: 7px 11px;
+
+        font-size: 14px;
+    }
+
     .solitaire__top-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
+        gap: 10px;
+    }
+
+    .solitaire__top-left {
+        gap: 10px;
     }
 
     .solitaire__foundations {
-        margin-left: 0;
+        gap: 8px;
     }
-} */
+
+    .solitaire__pile-title {
+        display: none;
+    }
+
+    .solitaire__board {
+        gap: 15px;
+    }
+
+    .solitaire__victory-modal {
+        width: min(100%, 380px);
+
+        padding: 28px 22px 22px;
+
+        border-radius: 16px;
+    }
+
+    .solitaire__victory-modal h2 {
+        font-size: 28px;
+
+        margin-bottom: 20px;
+    }
+
+    .solitaire__victory-actions {
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .solitaire__victory-actions button {
+        width: 100%;
+    }
+}
+
+
+/* =========================
+   Very small screens
+   ========================= */
+
+@media (max-width: 400px) {
+    .solitaire__header h1 {
+        font-size: 24px;
+    }
+
+    .solitaire__back-button,
+    .solitaire__new-game-button {
+        padding: 6px 9px;
+
+        font-size: 13px;
+    }
+
+    .solitaire__victory-backdrop {
+        padding: 12px;
+    }
+
+    .solitaire__victory-modal {
+        max-height: calc(100dvh - 24px);
+
+        padding: 24px 18px 18px;
+    }
+
+    .solitaire__victory-modal h2 {
+        font-size: 26px;
+    }
+}
