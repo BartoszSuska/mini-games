@@ -28,3 +28,7 @@ export type CardSource =
         type: "tableau"
         columnIndex: number
     }
+    | {
+        type: "foundation"
+        foundationIndex: number
+    }

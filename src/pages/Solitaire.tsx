@@ -150,6 +150,30 @@ function Solitaire() {
       )
     }
 
+    //foundation
+    const foundationIndex = gameState.foundations.findIndex(
+      (foundation) =>
+        foundation.some((card) => card.id === cardId)
+    );
+
+    if (foundationIndex !== -1) {
+      const foundationCard =
+        gameState.foundations[foundationIndex].at(-1);
+
+      if (!foundationCard || foundationCard.id !== cardId) {
+        return null;
+      }
+
+      return (
+        <img
+          className="solitaire__drag-overlay-card"
+          src={foundationCard.image}
+          alt={`${foundationCard.value} ${foundationCard.suit}`}
+          draggable={false}
+        />
+      );
+    }    
+
     //tableau
     const columnIndex = gameState.tableau.findIndex(
       (column) => column.some((card) => card.id === cardId)
@@ -271,6 +295,9 @@ function Solitaire() {
                 gameState?.waste.find((card) => card.id === cardId) ??
                 gameState?.tableau
                   .flat()
+                  .find((card) => card.id === cardId) ??
+                gameState.foundations
+                  .flat()
                   .find((card) => card.id === cardId)
 
               if(!card){
@@ -279,18 +306,31 @@ function Solitaire() {
 
               const sourceType =
                 gameState.waste.some((card) => card.id === cardId)
-                  ? {type: "waste" as const}
+                  ? { type: "waste" as const }
                   : (() => {
-                    const columnIndex = gameState.tableau.findIndex(
-                      (column) =>
-                        column.some((card) => card.id === cardId)
-                    )
+                      const columnIndex = gameState.tableau.findIndex(
+                        (column) =>
+                          column.some((card) => card.id === cardId)
+                      );
 
-                    return {
-                      type: "tableau" as const,
-                      columnIndex,
-                    }
-                  })()
+                      if (columnIndex !== -1) {
+                        return {
+                          type: "tableau" as const,
+                          columnIndex,
+                        };
+                      }
+
+                      const foundationIndex =
+                        gameState.foundations.findIndex(
+                          (foundation) =>
+                            foundation.some((card) => card.id === cardId)
+                        );
+
+                      return {
+                        type: "foundation" as const,
+                        foundationIndex,
+                      };
+                    })();
 
               //Drop on foundation
               if (targetId.startsWith("foundation-")) {

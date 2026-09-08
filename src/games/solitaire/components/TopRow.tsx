@@ -99,6 +99,7 @@ function TopRow({
                     key={index}
                     foundation={foundation}
                     index={index}
+                    activeDragId={activeDragId}
                 />
             ))}
         </div>

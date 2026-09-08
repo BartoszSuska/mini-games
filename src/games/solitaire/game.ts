@@ -302,6 +302,26 @@ export function moveCardToTableau(
         }
 
         cardsToMove = sourceColumn.slice(cardIndex)
+    } else if(source.type === "foundation"){
+        if (source.foundationIndex < 0) {
+            return gameState;
+        }
+
+        const sourceFoundation =
+            gameState.foundations[source.foundationIndex];
+
+        if (!sourceFoundation) {
+            return gameState;
+        }
+
+        const topCard = sourceFoundation.at(-1);
+
+        // Z foundation można zabrać tylko ostatnią kartę
+        if (!topCard || topCard.id !== card.id) {
+            return gameState;
+        }
+
+        cardsToMove = [card];       
     } else{
         cardsToMove = [card]
     }
@@ -346,9 +366,24 @@ export function moveCardToTableau(
         waste = gameState.waste.slice(0, -1)
     }
 
+    let foundations = gameState.foundations;
+
+    if (source.type === "foundation") {
+        foundations = gameState.foundations.map(
+            (foundation, index) => {
+                if (index !== source.foundationIndex) {
+                    return foundation;
+                }
+
+                return foundation.slice(0, -1);
+            }
+        );
+    }    
+
     return {
         ...gameState,
         waste,
+        foundations,
         tableau,
     }
 }

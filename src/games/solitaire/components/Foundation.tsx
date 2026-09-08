@@ -6,15 +6,21 @@ import Card from './Card'
 function Foundation({
     foundation,
     index,
+    activeDragId,
 }: {
     foundation: CardType[];
     index: number;
+    activeDragId: string | null;
 }) {
     const {ref, isDropTarget} = useDroppable({
         id: `foundation-${index}`,
     });
 
     const topCard = foundation.at(-1);
+
+    const isBeingDragged = 
+        topCard &&
+        activeDragId === `card-${topCard.id}`;
 
     return (
         <div className="solitaire__pile">
@@ -26,10 +32,14 @@ function Foundation({
                 data-foundation-index={index}
             >
                 {topCard ? (
-                    <img
-                        className="solitaire__card"
-                        src={topCard.image}
-                        alt={`${topCard.value} ${topCard.suit}`}
+                    <Card
+                        card={topCard}
+                        draggable={true}
+                        style={{
+                            visibility: isBeingDragged
+                                ? "hidden"
+                                : "visible"
+                        }}
                     />
                 ) : (
                     <div className="solitaire__card-placeholder" />
