@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import { useLanguage } from "@/LanguageContext";
 
 type VictoryModalProps = {
     onNewGame: () => void
@@ -9,6 +10,8 @@ function VictoryModal({
 }: VictoryModalProps) {
     const navigate = useNavigate()
 
+    const {t} = useLanguage()
+
     function handleBackToMenu(){
         navigate("/")
     }
@@ -18,10 +21,10 @@ function VictoryModal({
                 <h2>Zwycięstwo!</h2>
                 <div className="solitaire__victory-actions">
                     <button onClick={handleBackToMenu}>
-                        Powrót do Menu
+                        {t.utils.backToMenu}
                     </button>
                     <button onClick={onNewGame}>
-                        Nowa Gra
+                        {t.utils.newGame}
                     </button>
                 </div>
             </div>

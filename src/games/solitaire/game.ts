@@ -1,7 +1,7 @@
-import type { Card, GameState, CardSource } from "./types"
+import type { Card, GameState, CardSource, Difficulty } from "./types"
 import { getCardColor } from "./card"
 
-export function dealGame(deck: Card[]): GameState {
+export function dealGame(deck: Card[], difficulty: Difficulty): GameState {
     const tableau: Card[][] = [
         [],
         [],
@@ -41,6 +41,7 @@ export function dealGame(deck: Card[]): GameState {
         waste: [],
         foundations: [[], [], [], []],
         tableau,
+        difficulty,
     }
 }
 
@@ -52,16 +53,20 @@ export function drawFromStock(gameState: GameState): GameState {
     const stock = [...gameState.stock]
     const waste = [...gameState.waste]
 
-    const card = stock.pop()
+    const cardsToDraw = gameState.difficulty === "easy" ? 1 : 3
 
-    if(!card){
-        return gameState
+    for(let i = 0; i < cardsToDraw; i++){
+        const card = stock.pop()
+
+        if(!card){
+            break
+        }
+
+        waste.push({
+            ...card,
+            faceUp: true
+        })
     }
-
-    waste.push({
-        ...card,
-        faceUp: true,
-    })
 
     return {
         ...gameState,

@@ -13,11 +13,14 @@ export type Card ={
     faceUp: boolean
 }
 
+export type Difficulty = "easy" | "hard"
+
 export type GameState = {
     stock: Card[]
     waste: Card[]
     foundations: Card[][]
     tableau: Card[][]
+    difficulty: Difficulty
 }
 
 export type CardSource = 
@@ -32,3 +35,4 @@ export type CardSource =
         type: "foundation"
         foundationIndex: number
     }
+

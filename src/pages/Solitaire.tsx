@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react"
-import type {GameState, Card as CardType} from "../games/solitaire/types"
+import { useState, useEffect } from "react"
+import type {GameState, Card as CardType, Difficulty} from "../games/solitaire/types"
 import { createDeck, shuffleDeck} from "../games/solitaire/deck"
 import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, getFoundationIndex, moveCardToTableau } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
@@ -9,14 +9,23 @@ import useSolitaireLayout from "../games/solitaire/hooks/useSolitaireLayout"
 import TopRow from "../games/solitaire/components/TopRow";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import VictoryModal from "../games/solitaire/components/VictoryModal";
+import { LanguageProvider, useLanguage } from "@/LanguageContext";
+import DifficultyModal from "@/games/solitaire/components/DifficultyModal";
 
 function Solitaire() {
   const navigate = useNavigate();
 
+  const {t} = useLanguage()
+
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [invalidCardId, setInvalidCardId] = useState<string | null>(null)
   const DROP_ANIMATION_DURATION = 250
+
+  useEffect(() => {
+    setShowDifficultyModal(true)
+  }, [])
 
   const {
     boardRef,
@@ -30,14 +39,19 @@ function Solitaire() {
   } = useSolitaireLayout(gameState);
 
   /* start new game */
-  function startNewGame() {
+  function showDifficultySetting(){
+    setShowDifficultyModal(true)
+  }
+
+  function startNewGame(difficulty: Difficulty) {
     const newDeck = createDeck();
 
     const shuffledDeck = shuffleDeck(newDeck)
 
-    const newGame = dealGame(shuffledDeck)
+    const newGame = dealGame(shuffledDeck, difficulty)
 
     setGameState(newGame)
+    setShowDifficultyModal(false)
   }
 
   function handleStockClick() {
@@ -242,13 +256,13 @@ function Solitaire() {
     <main className="solitaire">
       <header className="solitaire__header">
         <button className="solitaire__back-button" onClick={() => navigate("/")}>
-          Back to Menu
+          {t.utils.backToMenu}
         </button>
 
-        <h1>Pasjans</h1>
+        <h2>{t.games.solitaire}</h2>
 
-        <button className="solitaire__new-game-button" onClick={startNewGame}>
-          New Game
+        <button className="solitaire__new-game-button" onClick={showDifficultySetting}>
+          {t.utils.newGame}
         </button>
       </header>
 
@@ -414,10 +428,16 @@ function Solitaire() {
 
           {isGameWon(gameState) && (
             <VictoryModal
-              onNewGame={startNewGame}
+              onNewGame={showDifficultySetting}
             />
           )}
         </div>
+      )}
+
+      {showDifficultyModal && (
+        <DifficultyModal
+          onSelect={startNewGame}
+        />
       )}
     </main>
   );
