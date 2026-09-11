@@ -1,5 +1,6 @@
-import type { Card, GameState, CardSource, Difficulty } from "./types"
-import { getCardColor } from "./card"
+import type { GameState, CardSource, Difficulty } from "./types"
+import type { Card } from "@/games/common/typesUtils"
+import { getCardColor } from "@/games/common/cardUtils"
 
 export function dealGame(deck: Card[], difficulty: Difficulty): GameState {
     const tableau: Card[][] = [

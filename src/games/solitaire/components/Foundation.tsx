@@ -1,7 +1,7 @@
 import React from 'react'
-import type { Card as CardType } from '../types'
+import type { Card as CardType } from '@/games/common/typesUtils'
 import { useDroppable } from '@dnd-kit/react';
-import Card from './Card'
+import Card from '../../common/components/Card'
 
 function Foundation({
     foundation,

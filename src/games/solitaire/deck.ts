@@ -1,4 +1,5 @@
-import type {Card, CardValue, Suit} from "./types"
+import type {Card, CardRank, CardValue, Suit} from "../common/typesUtils"
+import { shuffleDeck } from "../common/deckUtils";
 
 const suits: Suit[] = [
     "hearts",
@@ -11,7 +12,7 @@ const values: CardValue[] = [
     "A", "02", "03", "04", "05", "06", "07", "08", "09", "10", "J", "Q", "K"
 ]
 
-const cards: { value: CardValue; rank: number }[] = [
+const cards: { value: CardValue; rank: CardRank }[] = [
     { value: "A", rank: 1 },
     { value: "02", rank: 2 },
     { value: "03", rank: 3 },
@@ -44,22 +45,4 @@ export function createDeck(): Card[] {
     }
 
     return deck;
-}
-
-export function shuffleDeck(deck: Card[]): Card[] {
-    const shuffledDeck = [...deck]
-
-    for (let i = shuffledDeck.length - 1; i > 0; i--){
-        const randomIndex: number = Math.floor(Math.random() * (i + 1));
-
-        [
-            shuffledDeck[i],
-            shuffledDeck[randomIndex]
-        ] = [
-            shuffledDeck[randomIndex],
-            shuffledDeck[i]
-        ]
-    }
-
-    return shuffledDeck
 }

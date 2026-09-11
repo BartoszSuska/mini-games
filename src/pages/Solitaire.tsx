@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react"
-import type {GameState, Card as CardType, Difficulty} from "../games/solitaire/types"
-import { createDeck, shuffleDeck} from "../games/solitaire/deck"
+import type {GameState, Difficulty} from "../games/solitaire/types"
+import type {Card as CardType} from "../games/common/typesUtils"
+import { createDeck} from "../games/solitaire/deck"
+import { shuffleDeck } from "@/games/common/deckUtils";
 import { dealGame, drawFromStock, recycleWaste, moveCardToFoundation, getFoundationIndex, moveCardToTableau } from "../games/solitaire/game"
 import Tableau from "../games/solitaire/components/Tableau"
 import "../games/solitaire/solitaire.css"

@@ -1,6 +1,9 @@
 import React from 'react'
 import { LanguageProvider, useLanguage } from '@/LanguageContext'
 import { useNavigate } from "react-router-dom";
+import { createSpiderDeck } from '@/games/spider/deck';
+import { shuffleDeck } from '@/games/common/deckUtils';
+import { dealSpiderGame } from '@/games/spider/game';
 
 function Spider() {
     const navigate = useNavigate();

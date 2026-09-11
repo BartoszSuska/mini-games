@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
-import type { Card as CardType } from '../types'
-import Card from './Card'
+import type { Card as CardType } from '@/games/common/typesUtils'
+import Card from '../../common/components/Card'
 import Foundation from './Foundation'
 
 type TopRowProps = {

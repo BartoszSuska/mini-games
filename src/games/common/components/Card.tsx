@@ -1,4 +1,4 @@
-import type { Card as CardType } from '../types'
+import type { Card as CardType } from '@/games/common/typesUtils'
 import type { CSSProperties } from 'react';
 import { useDraggable } from '@dnd-kit/react';
 
