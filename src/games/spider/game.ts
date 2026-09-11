@@ -57,6 +57,10 @@ export function dealFromStock(
         return gameState
     }
 
+    if(gameState.tableau.some((column) => column.length === 0)){
+        return gameState
+    }
+
     const stock = [...gameState.stock]
     const tableau = gameState.tableau.map(
         (column) => [...column]
@@ -145,4 +149,145 @@ export function canMoveFromTableau(
     const cardsToMove = column.slice(cardIndex)
 
     return isValidSpiderSequence(cardsToMove)
+}
+
+export function canPlaceSequenceOnTableau(
+    tableau: Card[][],
+    targetColumnIndex: number,
+    cardsToMove: Card[],
+): boolean {
+    if(cardsToMove.length === 0){
+        return false
+    }
+
+    const targetColumn = tableau[targetColumnIndex]
+
+    if(!targetColumn){
+        return false
+    }
+
+    if(targetColumn.length === 0){
+        return true
+    }
+
+    const targetCard = targetColumn.at(-1)
+
+    if(!targetCard){
+        return false
+    }
+
+    return cardsToMove[0].rank === targetCard.rank - 1
+}
+
+export function moveSequenceToTableau(
+    gameState: SpiderGameState,
+    sourceColumnIndex: number,
+    cardIndex: number,
+    targetColumnIndex: number,
+): SpiderGameState {
+    const sourceColumn = gameState.tableau[sourceColumnIndex]
+    const targetColumn = gameState.tableau[targetColumnIndex]
+
+    if(!sourceColumn || !targetColumn){
+        return gameState
+    }
+
+    if(sourceColumnIndex === targetColumnIndex){
+        return gameState
+    }
+
+    const cardsToMove = sourceColumn.slice(cardIndex)
+
+    if(!isValidSpiderSequence(cardsToMove)){
+        return gameState
+    }
+
+    if(!canPlaceSequenceOnTableau(gameState.tableau, targetColumnIndex, cardsToMove)){
+        return gameState
+    }
+
+    const tableau = gameState.tableau.map(
+        (column) => [...column]
+    )
+
+    tableau[sourceColumnIndex] = tableau[sourceColumnIndex].slice(0, cardIndex)
+
+    tableau[targetColumnIndex] = [
+        ...tableau[targetColumnIndex],
+        ...cardsToMove,
+    ]
+
+    tableau[sourceColumnIndex] = revealTopCard(tableau[sourceColumnIndex])
+
+    const result = removeCompletedSequences(
+        tableau,
+        gameState.completedSequences,
+    )
+
+    return {
+        ...gameState,
+        tableau: result.tableau,
+        completedSequences: result.completedSequences,
+    }
+}
+
+function isCompleteSpiderSequence(
+    cards: Card[]
+): boolean {
+    if(cards.length !== 13){
+        return false
+    }
+
+    if(cards.some((card) => !card.faceUp)){
+        return false
+    }
+
+    for(let i = 0; i < 13; i++){
+        const card = cards[i]
+
+        if(card.rank !== 13 - i){
+            return false
+        }
+
+        if(i > 0 && card.suit !== cards[0].suit){
+            return false
+        }
+    }
+
+    return true
+}
+
+function removeCompletedSequences(
+    tableau: Card[][],
+    completedSequences: Card[][],
+): {
+    tableau: Card[][];
+    completedSequences: Card[][];
+} {
+    const newTableau = tableau.map((column) => [...column])
+    const newCompletedSequences = [...completedSequences]
+
+    for(let columnIndex = 0; columnIndex < newTableau.length; columnIndex++){
+        const column = newTableau[columnIndex]
+
+        if(column.length < 13){
+            continue
+        }
+
+        const sequence = column.slice(-13)
+
+        if(!isCompleteSpiderSequence(sequence)){
+            continue
+        }
+
+        newTableau[columnIndex] = column.slice(0, -13)
+        newCompletedSequences.push(sequence)
+
+        newTableau[columnIndex] = revealTopCard(newTableau[columnIndex])
+    }
+
+    return {
+        tableau: newTableau,
+        completedSequences: newCompletedSequences,
+    }
 }

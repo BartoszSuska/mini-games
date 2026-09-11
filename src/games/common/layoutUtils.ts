@@ -1,4 +1,17 @@
-export function calculatedCardSpacing(
+export function calculateCardWidth(
+    availableWidth: number,
+    columnCount: number,
+    gap: number,
+    maxCardWidth: number,
+): number {
+    const width =
+        (availableWidth - gap * (columnCount - 1)) /
+        columnCount;
+
+    return Math.min(width, maxCardWidth);
+}
+
+export function calculateCardSpacing(
     cardCount: number,
     availableHeight: number,
     cardHeight: number,

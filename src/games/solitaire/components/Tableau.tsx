@@ -1,5 +1,5 @@
 import type { Card as CardType } from "@/games/common/typesUtils";
-import { calculatedCardSpacing } from "../layout";
+import { calculateCardSpacing } from "@/games/common/layoutUtils";
 import Card from "../../common/components/Card"
 import { useDroppable } from "@dnd-kit/react";
 
@@ -42,7 +42,7 @@ function TableauColumn({
 
   const maxSpacing = cardHeight * MAX_CARD_SPACING_RATIO
 
-  const spacing = calculatedCardSpacing(
+  const spacing = calculateCardSpacing(
     column.length,
     availableHeight,
     cardHeight,
