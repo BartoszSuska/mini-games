@@ -4,12 +4,14 @@ import Card from "@/games/common/components/Card"
 
 type SpiderTopRowProps = {
     stock: CardType[];
+    completedSequences: CardType[][];
     topRowRef: React.RefObject<HTMLDivElement | null>;
     onStockClick: () => void;
 }
 
 function SpiderTopRow({
     stock,
+    completedSequences,
     topRowRef,
     onStockClick,
 }: SpiderTopRowProps) {
@@ -22,10 +24,6 @@ function SpiderTopRow({
         >
             <div className='spider__top-left'>
                 <div className='spider__pile'>
-                    <p className='spider__pile-title'>
-                        Stock
-                    </p>
-
                     <div
                         className='spider__stock'
                         onClick={onStockClick}
@@ -40,6 +38,31 @@ function SpiderTopRow({
                         )}
                     </div>
                 </div>
+            </div>
+
+            <div className='spider__completed'>
+                {Array.from({length: 8}).map((_, index) => {
+                    const sequence = completedSequences[index]
+                    const topCard = sequence?.[0]
+
+                    return (
+                        <div
+                            key={index}
+                            className='spider__completed-slot'
+                        >
+                            {topCard ? (
+                                <img
+                                    className="spider__completed-card"
+                                    src={topCard.image}
+                                    alt={`Completed sequence ${index+1}`}
+                                    draggable={false}
+                                />
+                            ): (
+                                <div className='spider__completed-placeholder' />
+                            )}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )

@@ -11,6 +11,7 @@ type SpiderTableauProps = {
     tableauHeight: number;
     tableauGap: number;
     activeDragId: string | null;
+    invalidCardIds: string[];
 }
 
 type SpiderTableauColumnProps = {
@@ -20,6 +21,7 @@ type SpiderTableauColumnProps = {
     cardHeight: number;
     tableauHeight: number;
     activeDragId: string | null;
+    invalidCardIds: string[];
 }
 
 const MIN_CARD_SPACING_RATIO = 0.08;
@@ -32,6 +34,7 @@ function SpiderTableauColumn({
     cardHeight,
     tableauHeight,
     activeDragId,
+    invalidCardIds,
 }: SpiderTableauColumnProps) {
     const { ref } = useDroppable({
         id: `tableau-${columnIndex}`
@@ -83,6 +86,7 @@ function SpiderTableauColumn({
                         card={card}
                         className="spider__tableau-card"
                         draggable={canDrag}
+                        invalid={invalidCardIds.includes(card.id)}
                         style={
                             {
                                 "--card-top": `${cardIndex * spacing}px`,
@@ -104,7 +108,8 @@ function SpiderTableau({
     cardHeight,
     tableauHeight,
     tableauGap,
-    activeDragId
+    activeDragId,
+    invalidCardIds,
 }: SpiderTableauProps){
     return (
         <div
@@ -124,6 +129,7 @@ function SpiderTableau({
                     cardHeight={cardHeight}
                     tableauHeight={tableauHeight}
                     activeDragId={activeDragId}
+                    invalidCardIds={invalidCardIds}
                 />
             ))}
         </div>

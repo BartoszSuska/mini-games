@@ -2,7 +2,7 @@ import { useState, useEffect} from 'react'
 import { LanguageProvider, useLanguage } from '@/LanguageContext'
 import { useNavigate } from "react-router-dom";
 import { createSpiderDeck } from '@/games/spider/deck';
-import { dealFromStock, dealSpiderGame, moveSequenceToTableau } from '@/games/spider/game';
+import { dealFromStock, dealSpiderGame, moveSequenceToTableau, canPlaceSequenceOnTableau, canMoveFromTableau } from '@/games/spider/game';
 import SpiderTableau from '@/games/spider/components/SpiderTableau';
 import useSpiderLayout from '@/games/spider/hooks/useSpiderLayout';
 import type { SpiderDifficulty, SpiderGameState } from '@/games/spider/types';
@@ -10,6 +10,7 @@ import { shuffleDeck } from '@/games/common/deckUtils';
 import SpiderTopRow from '@/games/spider/components/SpiderTopRow';
 import "@/games/spider/spider.css"
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
+import DifficultyModal from '@/games/spider/components/SpiderDifficultyModal';
 
 function Spider() {
     const navigate = useNavigate();
@@ -19,11 +20,9 @@ function Spider() {
     const [activeDragId, setActiveDragId] = useState<string | null>(null);
     const DROP_ANIMATION_DURATION = 250;
 
-    const difficulty: SpiderDifficulty = "one-suit"
+    const [invalidCardIds, setInvalidCardIds] = useState<string[]>([])
 
-    useEffect(() => {
-        startNewGame(difficulty)
-    }, [])
+    const [showDifficultyModa, setShowDifficultyModal] = useState(true)
 
     const {
         boardRef,
@@ -37,18 +36,19 @@ function Spider() {
     } = useSpiderLayout(gameState)
 
     function startNewGame(
-        difficulty: SpiderDifficulty
+        selectedDifficulty: SpiderDifficulty
     ) {
-        const newDeck = createSpiderDeck(difficulty)
+        const newDeck = createSpiderDeck(selectedDifficulty);
 
-        const shuffledDeck = shuffleDeck(newDeck)
+        const shuffledDeck = shuffleDeck(newDeck);
 
         const newGame = dealSpiderGame(
             shuffledDeck,
-            difficulty,
-        )
+            selectedDifficulty,
+        );
 
-        setGameState(newGame)
+        setGameState(newGame);
+        setShowDifficultyModal(false);
     }
 
     function handleStockClick() {
@@ -59,83 +59,6 @@ function Spider() {
         setGameState(
             dealFromStock(gameState)
         )
-    }
-
-    function handleDragEnd(event: any){
-        if(!gameState){
-            return
-        }
-
-        const {active, over} = event
-
-        if(!over){
-            return
-        }
-
-        const activeId = String(active.id)
-        const overId = String(over.id)
-
-        if(!activeId.startsWith("card-")){
-            return
-        }
-
-        if(!overId.startsWith("tableau-")){
-            return
-        }
-
-        const cardId = activeId.replace("card-", "")
-
-        const targetColumnIndex = Number(
-            overId.replace("tableau-", "")
-        )
-
-        if(
-            !Number.isInteger(targetColumnIndex) ||
-            targetColumnIndex < 0 ||
-            targetColumnIndex >= gameState.tableau.length
-        ) {
-            return
-        }
-
-        let sourceColumnIndex = -1
-        let cardIndex = -1
-
-        for(
-            let columnIndex = 0;
-            columnIndex < gameState.tableau.length;
-            columnIndex++
-        ) {
-            const index = gameState.tableau[columnIndex].findIndex(
-                (card) => card.id === cardId
-            )
-
-            if(index !== -1){
-                sourceColumnIndex = columnIndex
-                cardIndex = index
-                break
-            }
-        }
-
-        if(
-            sourceColumnIndex === -1 ||
-            cardIndex === -1
-        ) {
-            return
-        }
-
-        const result = moveSequenceToTableau(
-            gameState.tableau,
-            gameState.completedSequences,
-            sourceColumnIndex,
-            cardIndex,
-            targetColumnIndex
-        )
-
-        setGameState({
-            ...gameState,
-            tableau: result.tableau,
-            completedSequences: result.completedSequences,
-        })
     }
 
     function SpiderDragOverlay({
@@ -220,7 +143,7 @@ function Spider() {
 
                 <button
                     className="spider__new-game-button"
-                    onClick={() => startNewGame(difficulty)}
+                    onClick={() => setShowDifficultyModal(true)}
                 >
                     {t.utils.newGame}
                 </button>
@@ -303,6 +226,33 @@ function Spider() {
                                 return;
                             }
 
+                            const cardsToMove =
+                                gameState.tableau[sourceColumnIndex].slice(cardIndex);
+
+                            const canMove =
+                                canMoveFromTableau(
+                                    gameState.tableau,
+                                    sourceColumnIndex,
+                                    cardIndex
+                                ) &&
+                                canPlaceSequenceOnTableau(
+                                    gameState.tableau,
+                                    targetColumnIndex,
+                                    cardsToMove
+                                );
+
+                            if (!canMove) {
+                                setInvalidCardIds(
+                                    cardsToMove.map((card) => card.id)
+                                );
+
+                                setTimeout(() => {
+                                    setInvalidCardIds([]);
+                                }, 350);
+
+                                return;
+                            }                            
+
                             const result = moveSequenceToTableau(
                                 gameState.tableau,
                                 gameState.completedSequences,
@@ -321,6 +271,7 @@ function Spider() {
                     >
                         <SpiderTopRow
                             stock={gameState.stock}
+                            completedSequences={gameState.completedSequences}
                             topRowRef={topRowRef}
                             onStockClick={handleStockClick}
                         />
@@ -332,6 +283,7 @@ function Spider() {
                             tableauHeight={tableauHeight}
                             tableauGap={tableauGap}
                             activeDragId={activeDragId}
+                            invalidCardIds={invalidCardIds}
                         />
 
                         <DragOverlay>
@@ -352,6 +304,12 @@ function Spider() {
                         </DragOverlay>
                     </DragDropProvider>
                 </div>
+            )}
+
+            {showDifficultyModa && (
+                <DifficultyModal
+                    onSelect={startNewGame}
+                />
             )}
         </main>
     )
