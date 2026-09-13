@@ -313,7 +313,7 @@ function Spider() {
                         </DragOverlay>
                     </DragDropProvider>
 
-                {true && (
+                {isGameWon(gameState) && (
                     <SpiderVictoryModal
                         onNewGame={showDifficultySetting}
                     />
