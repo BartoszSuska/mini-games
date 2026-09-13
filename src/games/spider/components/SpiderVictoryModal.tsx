@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { useLanguage } from "@/LanguageContext";
 
-type VictoryModalProps = {
+type SpiderVictoryModalProps = {
     onNewGame: () => void
 }
 
-function VictoryModal({
+function SpiderVictoryModal({
     onNewGame,
-}: VictoryModalProps) {
+}: SpiderVictoryModalProps) {
     const navigate = useNavigate()
 
     const {t} = useLanguage()
@@ -16,10 +16,10 @@ function VictoryModal({
         navigate("/")
     }
     return (
-        <div className="solitaire__victory-backdrop">
-            <div className="solitaire__victory-modal">
+        <div className="spider__victory-backdrop">
+            <div className="spider__victory-modal">
                 <h2>{t.utils.victory}</h2>
-                <div className="solitaire__victory-actions">
+                <div className="spider__victory-actions">
                     <button onClick={handleBackToMenu}>
                         {t.utils.backToMenu}
                     </button>
@@ -32,4 +32,4 @@ function VictoryModal({
     )
 }
 
-export default VictoryModal
+export default SpiderVictoryModal

@@ -46,8 +46,8 @@ function DifficultyModal({
                             ))}
                         </div>
 
-                        <span>1 suit</span>
-                        <small>Easy</small>
+                        <span>{t.utils.oneColor}</span>
+                        <small>{t.utils.easy}</small>
                     </button>
 
                     <button
@@ -64,8 +64,8 @@ function DifficultyModal({
                             ))}
                         </div>
 
-                        <span>2 suits</span>
-                        <small>Medium</small>
+                        <span>{t.utils.twoColors}</span>
+                        <small>{t.utils.medium}</small>
                     </button>
 
                     <button
@@ -82,8 +82,8 @@ function DifficultyModal({
                             ))}
                         </div>
 
-                        <span>4 suits</span>
-                        <small>Hard</small>
+                        <span>{t.utils.fourColors}</span>
+                        <small>{t.utils.hard}</small>
                     </button>
                 </div>
             </div>

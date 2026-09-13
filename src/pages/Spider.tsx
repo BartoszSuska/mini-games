@@ -11,6 +11,7 @@ import SpiderTopRow from '@/games/spider/components/SpiderTopRow';
 import "@/games/spider/spider.css"
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import DifficultyModal from '@/games/spider/components/SpiderDifficultyModal';
+import SpiderVictoryModal from '@/games/spider/components/SpiderVictoryModal'
 
 function Spider() {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ function Spider() {
 
     const [invalidCardIds, setInvalidCardIds] = useState<string[]>([])
 
-    const [showDifficultyModa, setShowDifficultyModal] = useState(true)
+    const [showDifficultyModal, setShowDifficultyModal] = useState(true)
 
     const {
         boardRef,
@@ -34,6 +35,10 @@ function Spider() {
         boardGap,
         tableauHeight
     } = useSpiderLayout(gameState)
+
+    function showDifficultySetting(){
+        setShowDifficultyModal(true)
+    }    
 
     function startNewGame(
         selectedDifficulty: SpiderDifficulty
@@ -127,6 +132,10 @@ function Spider() {
                 ))}
             </div>
         )
+    }
+
+    function isGameWon(gameState: SpiderGameState): boolean {
+        return gameState.completedSequences.length >= 8
     }
 
     return (
@@ -303,10 +312,16 @@ function Spider() {
                             }}
                         </DragOverlay>
                     </DragDropProvider>
+
+                {true && (
+                    <SpiderVictoryModal
+                        onNewGame={showDifficultySetting}
+                    />
+                )}                    
                 </div>
             )}
 
-            {showDifficultyModa && (
+            {showDifficultyModal && (
                 <DifficultyModal
                     onSelect={startNewGame}
                 />
