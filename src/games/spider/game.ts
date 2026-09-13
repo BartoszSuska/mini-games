@@ -79,10 +79,16 @@ export function dealFromStock(
         })
     }
 
+    const result = removeCompletedSequences(
+        tableau,
+        gameState.completedSequences
+    )
+
     return{
         ...gameState,
         stock,
-        tableau,
+        tableau: result.tableau,
+        completedSequences: result.completedSequences,
     }
 }
 
@@ -180,55 +186,65 @@ export function canPlaceSequenceOnTableau(
 }
 
 export function moveSequenceToTableau(
-    gameState: SpiderGameState,
+    tableau: Card[][],
+    completedSequences: Card[][],
     sourceColumnIndex: number,
     cardIndex: number,
-    targetColumnIndex: number,
-): SpiderGameState {
-    const sourceColumn = gameState.tableau[sourceColumnIndex]
-    const targetColumn = gameState.tableau[targetColumnIndex]
-
-    if(!sourceColumn || !targetColumn){
-        return gameState
+    targetColumnIndex: number
+): {
+    tableau: Card[][];
+    completedSequences: Card[][];
+} {
+    if (sourceColumnIndex === targetColumnIndex) {
+        return {
+            tableau,
+            completedSequences,
+        };
     }
 
-    if(sourceColumnIndex === targetColumnIndex){
-        return gameState
-    }
+    const sourceColumn = tableau[sourceColumnIndex];
+    const targetColumn = tableau[targetColumnIndex];
 
-    const cardsToMove = sourceColumn.slice(cardIndex)
+    const cardsToMove = sourceColumn.slice(cardIndex);
 
-    if(!isValidSpiderSequence(cardsToMove)){
-        return gameState
-    }
-
-    if(!canPlaceSequenceOnTableau(gameState.tableau, targetColumnIndex, cardsToMove)){
-        return gameState
-    }
-
-    const tableau = gameState.tableau.map(
-        (column) => [...column]
-    )
-
-    tableau[sourceColumnIndex] = tableau[sourceColumnIndex].slice(0, cardIndex)
-
-    tableau[targetColumnIndex] = [
-        ...tableau[targetColumnIndex],
-        ...cardsToMove,
-    ]
-
-    tableau[sourceColumnIndex] = revealTopCard(tableau[sourceColumnIndex])
-
-    const result = removeCompletedSequences(
+    if (!canMoveFromTableau(
         tableau,
-        gameState.completedSequences,
-    )
-
-    return {
-        ...gameState,
-        tableau: result.tableau,
-        completedSequences: result.completedSequences,
+        sourceColumnIndex,
+        cardIndex
+    )) {
+        return {
+            tableau,
+            completedSequences,
+        };
     }
+
+    if (!canPlaceSequenceOnTableau(
+        tableau,
+        targetColumnIndex,
+        cardsToMove
+    )) {
+        return {
+            tableau,
+            completedSequences,
+        };
+    }
+
+    const newTableau = tableau.map((column) => [...column]);
+
+    newTableau[sourceColumnIndex] =
+        newTableau[sourceColumnIndex].slice(0, cardIndex);
+
+    newTableau[targetColumnIndex] = [
+        ...newTableau[targetColumnIndex],
+        ...cardsToMove,
+    ];
+
+    newTableau[sourceColumnIndex] = revealTopCard(newTableau[sourceColumnIndex])
+
+    return removeCompletedSequences(
+        newTableau,
+        completedSequences
+    );
 }
 
 function isCompleteSpiderSequence(

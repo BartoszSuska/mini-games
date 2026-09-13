@@ -56,7 +56,7 @@ export function createSpiderDeck(
                     suit,
                     rank,
                     value,
-                    image: `/mini-games-cards-card_${suit}_${value}.png`,
+                    image: `/mini-games/cards/card_${suit}_${value}.png`,
                     faceUp: false,
                 })
             }

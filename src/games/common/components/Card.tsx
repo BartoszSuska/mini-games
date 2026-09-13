@@ -23,7 +23,7 @@ function Card({ card, className = "", style, onClick, draggable=true, invalid=fa
   return (
     <img
       ref={ref}
-      className={`solitaire__card ${className} ${invalid ? "solitaire__card--invalid-move":""}`}
+      className={`card ${className} ${invalid ? "card--invalid-move":""}`}
       src={
         card.faceUp
           ? card.image

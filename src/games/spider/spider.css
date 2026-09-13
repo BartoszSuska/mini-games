@@ -1,13 +1,335 @@
+.spider {
+    height: 100dvh;
+    min-height: 0;
+
+    padding: clamp(10px, 3vw, 30px);
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   Header
+   ========================= */
+
+.spider__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+
+    flex-shrink: 0;
+}
+
+.spider__header h1,
+.spider__header h2 {
+    margin: 0;
+}
+
+.spider__back-button,
+.spider__new-game-button {
+    padding: 8px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--bg);
+    color: var(--text-h);
+
+    font: inherit;
+    font-size: 16px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.spider__back-button:hover,
+.spider__new-game-button:hover {
+    background: var(--accent-bg);
+    border-color: var(--accent-border);
+    color: var(--accent);
+}
+
+.spider__back-button:active,
+.spider__new-game-button:active {
+    transform: translateY(1px);
+}
+
+.spider__new-game-button {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.spider__new-game-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+
+    filter: brightness(1.08);
+}
+
+
+/* =========================
+   Board
+   ========================= */
+
+.spider__board {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: var(--board-gap);
+
+    flex: 1;
+    min-height: 0;
+}
+
+
+/* =========================
+   Top row
+   ========================= */
+
+.spider__top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    width: 100%;
+
+    gap: var(--top-row-gap);
+
+    flex-shrink: 0;
+}
+
+.spider__top-left {
+    display: flex;
+
+    gap: var(--top-row-gap);
+
+    flex-shrink: 0;
+}
+
+.spider__pile {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    text-align: center;
+}
+
+.spider__pile-title {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.spider__stock {
+    width: var(--card-width);
+    height: var(--card-height);
+
+    position: relative;
+
+    cursor: pointer;
+}
+
+.spider__stock .card {
+    width: var(--card-width);
+    height: var(--card-height);
+
+    display: block;
+}
+
+.spider__card-placeholder {
+    width: var(--card-width);
+    height: var(--card-height);
+
+    box-sizing: border-box;
+
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+
+    background: var(--accent-bg);
+}
+
+
+/* =========================
+   Card placeholder
+   ========================= */
+
+.spider__card-placeholder {
+    box-sizing: border-box;
+
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+
+    background: var(--accent-bg);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text);
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================
+   Completed sequences
+   ========================= */
+
+.spider__completed {
+    display: flex;
+    align-items: center;
+
+    color: var(--text);
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================
+   Tableau
+   ========================= */
+
 .spider__tableau {
     display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr));
+
+    grid-template-columns: repeat(
+        10,
+        minmax(0, 1fr)
+    );
+
+    gap: var(--tableau-gap);
+
+    align-items: flex-start;
+
     width: 100%;
+
+    flex: 1;
+    min-height: 0;
+
+    position: relative;
 }
 
 .spider__tableau-column {
+    width: 100%;
+
     position: relative;
+
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+}
+
+.spider__tableau-card {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    top: var(--card-top);
+}
+
+.spider__drag-overlay-stack {
+    position: relative;
+    pointer-events: none;
+}
+
+.spider__drag-overlay-card {
+    position: absolute;
+    left: 0;
+    width: var(--card-width);
+    height: var(--card-height);
+    user-select: none;
+}
+
+/* =========================
+   Cards
+   ========================= */
+
+.spider__card {
+    width: var(--card-width);
+    height: var(--card-height);
+
+    display: block;
+
+    user-select: none;
+}
+
+
+/* =========================
+   Smaller screens
+   ========================= */
+
+@media (max-width: 700px) {
+    .spider {
+        padding: 10px;
+    }
+
+    .spider__header {
+        margin-bottom: 10px;
+    }
+
+    .spider__header h1,
+    .spider__header h2 {
+        font-size: 28px;
+    }
+
+    .spider__back-button,
+    .spider__new-game-button {
+        padding: 7px 11px;
+
+        font-size: 14px;
+    }
+
+    .spider__top-row {
+        gap: 10px;
+    }
+
+    .spider__top-left {
+        gap: 10px;
+    }
+
+    .spider__board {
+        gap: 15px;
+    }
+}
+
+
+/* =========================
+   Very small screens
+   ========================= */
+
+@media (max-width: 400px) {
+    .spider__header h1,
+    .spider__header h2 {
+        font-size: 24px;
+    }
+
+    .spider__back-button,
+    .spider__new-game-button {
+        padding: 6px 9px;
+
+        font-size: 13px;
+    }
 }
