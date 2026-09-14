@@ -8,6 +8,7 @@ type TopRowProps = {
     waste: CardType[];
     foundations: CardType[][];
     topRowRef: RefObject<HTMLDivElement | null>;
+    stockRef: RefObject<HTMLDivElement | null>;
     onStockClick: () => void;
     onWasteClick: () => void;
     activeDragId: string | null;
@@ -19,6 +20,7 @@ function TopRow({
     waste,
     foundations,
     topRowRef,
+    stockRef,
     onStockClick,
     onWasteClick,
     activeDragId,
@@ -34,7 +36,7 @@ function TopRow({
     >
         <div className="solitaire__top-left">
             {/* Stock */}
-            <div className="solitaire__pile">
+            <div ref={stockRef} className="solitaire__pile">
 
                 {stock.length > 0 ? (
                     <img

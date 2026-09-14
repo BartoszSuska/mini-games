@@ -7,6 +7,7 @@ type SpiderTopRowProps = {
     completedSequences: CardType[][];
     topRowRef: React.RefObject<HTMLDivElement | null>;
     onStockClick: () => void;
+    stockRef: React.RefObject<HTMLDivElement | null>;
 }
 
 function SpiderTopRow({
@@ -14,51 +15,63 @@ function SpiderTopRow({
     completedSequences,
     topRowRef,
     onStockClick,
+    stockRef,
 }: SpiderTopRowProps) {
     const topCard = stock.at(-1)
 
     return (
         <div
             ref={topRowRef}
-            className='spider__top-row'
+            className="spider__top-row"
         >
-            <div className='spider__top-left'>
-                <div className='spider__pile'>
+            <div className="spider__top-left">
+                <div className="spider__pile">
                     <div
-                        className='spider__stock'
+                        className="spider__stock"
                         onClick={onStockClick}
                     >
                         {topCard ? (
-                            <Card
-                                card={topCard}
-                                draggable={false}
+                            <div
+                                ref={stockRef}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                }}
+                            >
+                                <Card
+                                    card={topCard}
+                                    draggable={false}
+                                />
+                            </div>
+                        ) : (
+                            <div
+                                ref={stockRef}
+                                className="spider__card-placeholder"
                             />
-                        ): (
-                            <div className='spider__card-placeholder' />
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className='spider__completed'>
-                {Array.from({length: 8}).map((_, index) => {
+            <div className="spider__completed">
+                {Array.from({ length: 8 }).map((_, index) => {
                     const sequence = completedSequences[index]
                     const topCard = sequence?.[0]
 
                     return (
                         <div
                             key={index}
-                            className='spider__completed-slot'
+                            className="spider__completed-slot"
                         >
                             {topCard ? (
                                 <img
                                     className="spider__completed-card"
                                     src={topCard.image}
-                                    alt={`Completed sequence ${index+1}`}
+                                    alt={`Completed sequence ${index + 1}`}
                                     draggable={false}
                                 />
-                            ): (
-                                <div className='spider__completed-placeholder' />
+                            ) : (
+                                <div className="spider__completed-placeholder" />
                             )}
                         </div>
                     )

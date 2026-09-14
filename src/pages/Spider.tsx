@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react'
+import { useState, useEffect, useRef} from 'react'
 import { LanguageProvider, useLanguage } from '@/LanguageContext'
 import { useNavigate } from "react-router-dom";
 import { createSpiderDeck } from '@/games/spider/deck';
@@ -18,6 +18,10 @@ function Spider() {
     const {t} = useLanguage()
 
     const [gameState, setGameState] = useState<SpiderGameState | null>(null)
+    const [isDealing, setIsDealing] = useState(false);
+    const [dealId, setDealId] = useState(0);
+
+    const stockRef = useRef<HTMLDivElement | null>(null);
     const [activeDragId, setActiveDragId] = useState<string | null>(null);
     const DROP_ANIMATION_DURATION = 250;
 
@@ -36,6 +40,29 @@ function Spider() {
         tableauHeight
     } = useSpiderLayout(gameState)
 
+    useEffect(() => {
+        if (!isDealing) {
+            return;
+        }
+
+        const dealCardCount =
+            gameState?.tableau.reduce(
+                (total, column) => total + column.length,
+                0
+            ) ?? 0;
+
+        const dealDuration =
+            450 + Math.max(0, dealCardCount - 1) * 55;
+
+        const timeout = setTimeout(() => {
+            setIsDealing(false);
+        }, dealDuration + 100);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [isDealing, gameState]);
+
     function showDifficultySetting(){
         setShowDifficultyModal(true)
     }    
@@ -53,6 +80,8 @@ function Spider() {
         );
 
         setGameState(newGame);
+        setDealId((id) => id + 1);
+        setIsDealing(true);
         setShowDifficultyModal(false);
     }
 
@@ -283,6 +312,7 @@ function Spider() {
                             completedSequences={gameState.completedSequences}
                             topRowRef={topRowRef}
                             onStockClick={handleStockClick}
+                            stockRef={stockRef}
                         />
 
                         <SpiderTableau
@@ -293,6 +323,9 @@ function Spider() {
                             tableauGap={tableauGap}
                             activeDragId={activeDragId}
                             invalidCardIds={invalidCardIds}
+                            isDealing={isDealing}
+                            stockRef={stockRef}
+                            dealId={dealId}
                         />
 
                         <DragOverlay>

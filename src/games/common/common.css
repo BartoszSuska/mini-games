@@ -36,3 +36,51 @@
         rotate: 0deg;
     }
 }
+
+.flippable-card {
+    width: 100%;
+    height: 100%;
+
+    perspective: 1000px;
+}
+
+.flippable-card__inner {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-style: preserve-3d;
+
+    transition:
+        transform 0.5s ease;
+}
+
+.flippable-card__inner--face-up {
+    transform: rotateY(180deg);
+}
+
+.flippable-card__face {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    user-select: none;
+    pointer-events: none;
+}
+
+.flippable-card__face--back {
+    transform: rotateY(0deg);
+}
+
+.flippable-card__face--front {
+    transform: rotateY(180deg);
+}

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import type {GameState, Difficulty} from "../games/solitaire/types"
 import type {Card as CardType} from "../games/common/typesUtils"
 import { createDeck} from "../games/solitaire/deck"
@@ -20,6 +20,9 @@ function Solitaire() {
   const {t} = useLanguage()
 
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [isDealing, setIsDealing] = useState(false);
+  const [dealId, setDealId] = useState(0);
+  const stockRef = useRef<HTMLDivElement | null>(null);
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [invalidCardId, setInvalidCardId] = useState<string | null>(null)
@@ -28,6 +31,29 @@ function Solitaire() {
   useEffect(() => {
     setShowDifficultyModal(true)
   }, [])
+
+  useEffect(() => {
+      if (!isDealing) {
+          return;
+      }
+
+      const dealCardCount =
+          gameState?.tableau.reduce(
+              (total, column) => total + column.length,
+              0
+          ) ?? 0;
+
+      const dealDuration =
+          450 + Math.max(0, dealCardCount - 1) * 55;
+
+      const timeout = setTimeout(() => {
+          setIsDealing(false);
+      }, dealDuration + 100);
+
+      return () => {
+          clearTimeout(timeout);
+      };
+  }, [isDealing, gameState]);  
 
   const {
     boardRef,
@@ -53,6 +79,8 @@ function Solitaire() {
     const newGame = dealGame(shuffledDeck, difficulty)
 
     setGameState(newGame)
+    setDealId((id) => id + 1);
+    setIsDealing(true)
     setShowDifficultyModal(false)
   }
 
@@ -394,6 +422,7 @@ function Solitaire() {
               waste={gameState.waste}
               foundations={gameState.foundations}
               topRowRef={topRowRef}
+              stockRef={stockRef}
               onStockClick={handleStockClick}
               onWasteClick={handleWasteClick}
               activeDragId={activeDragId}
@@ -408,6 +437,9 @@ function Solitaire() {
               onCardClick={handleTableauCardClick}
               activeDragId={activeDragId}
               invalidCardId={invalidCardId}
+              isDealing={isDealing}
+              stockRef={stockRef}
+              dealId={dealId}
             />
 
             <DragOverlay>
